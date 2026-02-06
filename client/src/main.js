@@ -1,24 +1,19 @@
-import Phaser from 'phaser';
-import GameScene from './scenes/GameScene';
+/**
+ * Tank Bang Bang - Main Application Entry
+ * Khởi tạo router và pages
+ */
 
-const config = {
-  type: Phaser.AUTO,
-  width: '100%',
-  height: '100%',
-  scale: {
-    mode: Phaser.Scale.RESIZE,
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  },
-  parent: 'game-container',
-  backgroundColor: '#5d5d5d', // Nền màu xám giống sàn kim loại
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: { y: 0 }, // Game nhìn từ trên xuống, không có trọng lực
-      debug: false
-    }
-  },
-  scene: [GameScene]
-};
+import { initRouter } from './utils/router.js';
+import { initAuthPage } from './pages/AuthPage.js';
+import { initLobbyPage } from './pages/LobbyPage.js';
+import { isAuthenticated } from './utils/auth.js';
 
-const game = new Phaser.Game(config);
+// Initialize pages
+initAuthPage();
+initLobbyPage();
+
+// Initialize router
+initRouter();
+
+console.log('✅ Tank Bang Bang loaded!');
+console.log('Authenticated:', isAuthenticated());
