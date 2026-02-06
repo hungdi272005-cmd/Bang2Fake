@@ -1,28 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tank Bang Bang Clone</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: #2d2d2d;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        overflow: hidden;
-      }
-      #game-container {
-        /* Phaser sẽ chèn canvas vào đây */
-        box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      }
-    </style>
+    <title>Tank Bang Bang - Chiến trận Tank đỉnh cao</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/src/pages/AuthPage.css">
+    <link rel="stylesheet" href="/src/pages/LobbyPage.css">
   </head>
   <body>
-    <div id="game-container"></div>
+    <!-- Signin Page -->
+    <div id="signin-page" class="page"></div>
+
+    <!-- Signup Page -->
+    <div id="signup-page" class="page hidden"></div>
+
+    <!-- Lobby Page -->
+    <div id="lobby-page" class="page hidden"></div>
+
+    <!-- Game Page (game Phaser hiện tại) -->
+    <div id="game-page" class="page hidden">
+      <div id="game-container"></div>
+    </div>
+
+    <!-- Main App Script -->
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

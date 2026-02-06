@@ -1,0 +1,118 @@
+/* Auth Page Specific Styles */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-md);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-header {
+  margin-bottom: var(--space-xl);
+}
+
+.auth-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin-top: var(--space-sm);
+  font-weight: 500;
+}
+
+/* Toggle Buttons */
+.auth-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.toggle-btn {
+  padding: var(--space-sm);
+  font-size: 0.875rem;
+  transition: all var(--transition-smooth);
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, var(--primary-orange), var(--primary-gold));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 15px var(--shadow-glow);
+}
+
+/* Auth Forms */
+.auth-form {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.btn-full {
+  width: 100%;
+  padding: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+#login-error,
+#register-error {
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: var(--space-md);
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .auth-subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* Auth Switch Link */
+.auth-switch {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.auth-link {
+  color: var(--primary-orange);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.auth-link:hover {
+  color: var(--primary-gold);
+  text-decoration: underline;
+}
+
