@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getMe } = require('../controllers/authController');
+const { register, login, getMe, setupCharacter } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 
 /**
@@ -23,5 +23,12 @@ router.post('/login', login);
  * @access  Private (cần JWT token)
  */
 router.get('/me', protect, getMe);
+
+/**
+ * @route   POST /api/auth/setup-character
+ * @desc    Thiết lập nhân vật (avatar + tên hiển thị)
+ * @access  Private (cần JWT token)
+ */
+router.post('/setup-character', protect, setupCharacter);
 
 module.exports = router;

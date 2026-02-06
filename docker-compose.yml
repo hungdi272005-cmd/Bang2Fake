@@ -1,0 +1,55 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: bangbang-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=tankbangbang
+    networks:
+      - bangbang-network
+
+  # Backend Server (Node.js + Express + Socket.io)
+  server:
+    build: ./server
+    container_name: bangbang-server
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongodb:27017/tankbangbang
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+      - JWT_EXPIRES_IN=7d
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    networks:
+      - bangbang-network
+
+  # Frontend Client (Nginx)
+  client:
+    build: ./client
+    container_name: bangbang-client
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
+    networks:
+      - bangbang-network
+
+# Named volume for MongoDB data persistence
+volumes:
+  mongodb_data:
+
+# Network for inter-container communication
+networks:
+  bangbang-network:
+    driver: bridge

@@ -4,12 +4,16 @@
  */
 
 import { initRouter } from './utils/router.js';
-import { initAuthPage } from './pages/AuthPage.js';
-import { initLobbyPage } from './pages/LobbyPage.js';
+import { initLandingPage } from './pages/landing/LandingPage.js';
+import { initAuthPage } from './pages/auth/AuthPage.js';
+import { initCharacterSetupPage } from './pages/character/CharacterSetupPage.js';
+import { initLobbyPage } from './pages/lobby/LobbyPage.js';
 import { isAuthenticated } from './utils/auth.js';
 
 // Initialize pages
+initLandingPage();
 initAuthPage();
+initCharacterSetupPage();
 initLobbyPage();
 
 // Initialize router

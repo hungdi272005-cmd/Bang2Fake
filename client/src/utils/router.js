@@ -6,9 +6,10 @@
 import { isAuthenticated } from './auth.js';
 
 const routes = {
-  '/': 'signin',        // Default to signin
+  '/': 'landing',       // Landing page
   '/signin': 'signin',  // Login page
   '/signup': 'signup',  // Register page
+  '/character-setup': 'character-setup', // Character setup page
   '/lobby': 'lobby',    // Lobby page (sau khi đăng nhập)
   '/game': 'game'       // Game page
 };
@@ -19,6 +20,9 @@ const routes = {
 export function navigateTo(path) {
   // Update URL without reload
   window.history.pushState({}, '', path);
+  
+  // Save current path to localStorage (for hot reload persistence)
+  localStorage.setItem('currentPath', path);
   
   // Render page
   renderPage(path);
@@ -31,9 +35,9 @@ export function renderPage(path) {
   const pageName = routes[path] || 'signin';
   
   // Route guards
-  if (pageName === 'lobby' || pageName === 'game') {
+  if (pageName === 'lobby' || pageName === 'game' || pageName === 'character-setup') {
     if (!isAuthenticated()) {
-      navigateTo('/signin');
+      navigateTo('/');
       return;
     }
   }
@@ -48,6 +52,21 @@ export function renderPage(path) {
   document.querySelectorAll('.page').forEach(page => {
     page.classList.add('hidden');
   });
+  
+  // Re-initialize pages that need fresh data
+  if (pageName === 'lobby') {
+    // Import and re-init lobby to get fresh user data
+    import('../pages/lobby/LobbyPage.js').then(module => {
+      module.initLobbyPage();
+    });
+  }
+  
+  if (pageName === 'landing') {
+    // Re-init landing to check auth status
+    import('../pages/landing/LandingPage.js').then(module => {
+      module.initLandingPage();
+    });
+  }
   
   // Show target page
   const targetPage = document.getElementById(`${pageName}-page`);
@@ -65,7 +84,18 @@ export function initRouter() {
     renderPage(window.location.pathname);
   });
   
-  // Handle initial page load
+  // Restore previous path from localStorage (for hot reload)
+  const savedPath = localStorage.getItem('currentPath');
   const currentPath = window.location.pathname;
-  renderPage(currentPath);
+  
+  // If we have a saved path and we're authenticated, restore it
+  // Otherwise use current path or default to landing
+  if (savedPath && isAuthenticated()) {
+    renderPage(savedPath);
+  } else if (currentPath && currentPath !== '/') {
+    renderPage(currentPath);
+  } else {
+    // Default to landing page
+    renderPage('/');
+  }
 }

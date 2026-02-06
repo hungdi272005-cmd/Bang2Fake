@@ -69,7 +69,7 @@ export async function login(username, password) {
 export function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.href = '/';
+  localStorage.removeItem('currentPath'); // Clear saved path
 }
 
 /**
@@ -123,6 +123,40 @@ export async function getCurrentUser() {
   } catch (error) {
     // Token hết hạn hoặc invalid
     logout();
+    throw error;
+  }
+}
+
+/**
+ * Thiết lập nhân vật (avatar + display name)
+ */
+export async function setupCharacter(avatar, displayName) {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('Chưa đăng nhập');
+    }
+
+    const response = await fetch(`${API_URL}/auth/setup-character`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ avatar, displayName })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Thiết lập nhân vật thất bại');
+    }
+
+    // Cập nhật localStorage
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    return data;
+  } catch (error) {
     throw error;
   }
 }

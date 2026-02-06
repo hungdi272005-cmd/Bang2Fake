@@ -73,6 +73,7 @@ const register = async (req, res) => {
         phone: user.phone,
         stats: user.stats,
         selectedTank: user.selectedTank,
+        isFirstLogin: user.isFirstLogin,
         createdAt: user.createdAt
       }
     });
@@ -138,6 +139,9 @@ const login = async (req, res) => {
         id: user._id,
         username: user.username,
         phone: user.phone,
+        avatar: user.avatar,
+        displayName: user.displayName,
+        isFirstLogin: user.isFirstLogin,
         stats: user.stats,
         selectedTank: user.selectedTank,
         lastLogin: user.lastLogin
@@ -185,8 +189,79 @@ const getMe = async (req, res) => {
   }
 };
 
+/**
+ * @route   POST /api/auth/setup-character
+ * @desc    Setup character (avatar + display name) after first login
+ * @access  Private
+ */
+const setupCharacter = async (req, res) => {
+  try {
+    const { avatar, displayName } = req.body;
+
+    // Validation
+    if (!avatar || !displayName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng chọn biểu tượng và nhập tên hiển thị'
+      });
+    }
+
+    if (!['male', 'female'].includes(avatar)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Biểu tượng không hợp lệ'
+      });
+    }
+
+    if (displayName.length < 3 || displayName.length > 20) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tên hiển thị phải có 3-20 ký tự'
+      });
+    }
+
+    // req.user đã được set bởi protect middleware
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy người dùng'
+      });
+    }
+
+    // Update character info
+    user.avatar = avatar;
+    user.displayName = displayName;
+    user.isFirstLogin = false;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Thiết lập nhân vật thành công',
+      user: {
+        id: user._id,
+        username: user.username,
+        avatar: user.avatar,
+        displayName: user.displayName,
+        isFirstLogin: user.isFirstLogin,
+        stats: user.stats,
+        selectedTank: user.selectedTank
+      }
+    });
+  } catch (error) {
+    console.error('Setup character error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi thiết lập nhân vật',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
-  getMe
+  getMe,
+  setupCharacter
 };

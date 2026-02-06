@@ -26,6 +26,23 @@ const userSchema = new mongoose.Schema({
     minlength: [6, 'Mật khẩu phải có ít nhất 6 ký tự'],
     select: false // Không trả về password khi query
   },
+  // Character setup fields
+  avatar: {
+    type: String,
+    enum: ['male', 'female'],
+    default: null
+  },
+  displayName: {
+    type: String,
+    trim: true,
+    minlength: [3, 'Tên hiển thị phải có ít nhất 3 ký tự'],
+    maxlength: [20, 'Tên hiển thị không được quá 20 ký tự'],
+    default: null
+  },
+  isFirstLogin: {
+    type: Boolean,
+    default: true
+  },
   stats: {
     gamesPlayed: { type: Number, default: 0 },
     wins: { type: Number, default: 0 },
