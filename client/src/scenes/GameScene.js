@@ -4,6 +4,7 @@ import UIManager from './components/UIManager';
 import InputManager from './components/InputManager';
 import GundamConfig from '../entities/tanks/Gundam'; // Import Định nghĩa Tank
 import PhoenixConfig from '../entities/tanks/Phoenix'; // Import Phoenix
+import KakashiConfig from '../entities/tanks/Kakashi'; // Import Kakashi
 import BattleMap from '../maps/BattleMap';
 import FPSDisplay from '../trangthai/FPSDisplay';
 import NetworkStatus from '../trangthai/NetworkStatus';
@@ -25,8 +26,10 @@ export default class GameScene extends Phaser.Scene {
     // Tải hình ảnh
     this.load.image('tank_phoenix', 'Pictures_of_phoenix/tank_phoenix.png');
     this.load.image('tank_gundam', 'Pictures_of_gundam/tank_gundam.png');
+    this.load.image('tank_kakashi', 'picktures_of_kakashi/tank_kakashi.png');
     this.load.image('bullet_quickdraw', 'Pictures_of_gundam/Danrutsungnhanh.png');
     this.load.image('skill_laser_blast', 'Pictures_of_gundam/laze.png');
+    this.load.image('skill_chidori', 'picktures_of_kakashi/chidori.png');
   }
 
   create() {
@@ -44,8 +47,8 @@ export default class GameScene extends Phaser.Scene {
     // --- SPAWN TANK (PLAYER) ---
     const spawnPoints = this.map.getSpawnPoints();
     const spawnPos = spawnPoints.length > 0 ? spawnPoints[0] : { x: 100, y: 100 };
-    // Player: Team 1
-    const pConfig = { ...PhoenixConfig, team: 1 };
+    // Player: Team 1 - Kakashi
+    const pConfig = { ...KakashiConfig, team: 1 };
     this.player = new Tank(this, spawnPos.x, spawnPos.y, pConfig);
 
     // --- SPAWN DUMMY ENEMY (Gundam) ---
@@ -137,8 +140,10 @@ export default class GameScene extends Phaser.Scene {
         // Tìm instance Tank từ container (hoặc xử lý trực tiếp nếu logic đơn giản)
         // Ở đây mình biết enemyContainer là container của this.dummy
         if (this.dummy && this.dummy.container === enemyContainer) {
-            this.dummy.takeDamage(50); // Mặc định damage 50
-            console.log(`Enemy Hit! Health: ${this.dummy.health.currentHealth}/${this.dummy.health.maxHealth}`);
+            // Lấy damage từ viên đạn (đã được TankWeapon tính toán)
+            const damage = projectile.damage || 50; 
+            this.dummy.takeDamage(damage); 
+            console.log(`Enemy Hit! Damage: ${damage}. Health: ${this.dummy.health.currentHealth}/${this.dummy.health.maxHealth}`);
             
             // Hiệu ứng nháy đỏ khi trúng đạn
             if (this.dummy.body.setTint) {
@@ -150,7 +155,7 @@ export default class GameScene extends Phaser.Scene {
         }
     });
 
-    // Camera
+    // Camera theo dõi tank player (tức thì - không delay)
     this.cameras.main.startFollow(this.player.container);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
@@ -193,20 +198,10 @@ export default class GameScene extends Phaser.Scene {
     const height = gameSize.height;
 
     this.cameras.main.setViewport(0, 0, width, height);
-    this.cameras.main.setBounds(0, 0, width, height);
-    
-    // Khi resize thì gọi map để xử lý nếu cần (nhưng physics world bounds set ở create rồi)
-    // Nếu muốn set lại physics world bounds khi resize thì có thể thêm vào đây
-    // this.physics.world.setBounds(0, 0, width, height); 
-    // -> Nhưng map cố định kích thước, không nên đổi world bounds theo window size nếu map lớn hơn window.
-
-    // Update Grid Position - Grid đang được quản lý bởi BattleMap, nhưng ở đây logic cũ là update grid instance
-    // Nếu muốn resize grid chuẩn, ta gọi map.resize
+    // QUAN TRỌNG: Giữ bounds của camera theo kích thước MAP, KHÔNG theo kích thước màn hình
+    // Nếu set theo width/height màn hình thì camera sẽ đi ra ngoài map (khoảng đen)
     if (this.map) {
-         // Tuy nhiên, grid trong BattleMap đang set kích thước theo mapWidth/Height chứ không phải theo screen.
-         // Nhưng camera bounds thì theo map size.
-         // Logic cũ là: grid.setPosition(width/2, height/2) và size(width, height) -> Grid trải kín màn hình?
-         // Grid cũ: list_dir cho thấy đã chuyển logic vào BattleMap class.
+         this.cameras.main.setBounds(0, 0, this.map.getWidth(), this.map.getHeight());
     }
     
     // Update UI position

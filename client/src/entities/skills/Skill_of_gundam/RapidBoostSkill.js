@@ -74,7 +74,7 @@ export default class RapidBoostSkill extends Skill {
       }
 
       // 1. Kích hoạt Tăng tốc
-      movementComponent.setSpeed(270);
+      movementComponent.setSpeed(170);
 
       // 2. Kích hoạt Chế độ Bắn Nhau
       weaponComponent.setBurstMode(true);

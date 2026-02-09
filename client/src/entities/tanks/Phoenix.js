@@ -10,12 +10,12 @@ export default {
   color: 0xff4500, // Orange Red
   stats: {
     health: 800, // Phoenix có thể yếu máu hơn nhưng nhanh hơn?
-    speed: 220
+    speed: 100
   },
   weapon: {
     range: 350,
     bulletSpeed: 400, 
-    fireRate: 800,
+    fireRate: 1000,
     bulletStyle: 'phoenix', // Bullet style: 'standard' | 'gundam' | 'phoenix'
     singleBullet: true
   },

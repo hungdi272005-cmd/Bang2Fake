@@ -1,22 +1,23 @@
-import RapidBoostSkill from '../skills/Skill_of_gundam/RapidBoostSkill';
-import QuickDrawSkill from '../skills/Skill_of_gundam/QuickDrawSkill';
-import LaserBlastSkill from '../skills/Skill_of_gundam/LaserBlastSkill';
+import SubstitutionSkill from '../skills/skill_of_kakashi/SubstitutionSkill';
+import ChidoriSkill from '../skills/skill_of_kakashi/ChidoriSkill';
+import KamuiSkill from '../skills/skill_of_kakashi/KamuiSkill'; 
 
 export default {
   name: 'Kakashi',
   stats: {
     health: 1000,
-    speed: 200
+    speed: 100
   },
   weapon: {
     range: 300,
-    bulletSpeed: 600,
-    fireRate: 500
+    bulletSpeed: 400,
+    fireRate: 1000,
+    damage: 40, // Sát thương cơ bản
+    bulletStyle: 'kakashi' // Sử dụng đạn phi tiêu của Kakashi
   },
   skills: {
-    e: RapidBoostSkill,
-    r: QuickDrawSkill,
-    space: LaserBlastSkill
-    // Q mặc định là Dash trong lớp Tank, hoặc có thể được ghi đè ở đây
+    e: SubstitutionSkill, // Chiêu E: Thuật Ẩn Thân
+    r: ChidoriSkill,      // Chiêu R: Chidori
+    space: KamuiSkill     // Chiêu Space: Kamui
   }
 };

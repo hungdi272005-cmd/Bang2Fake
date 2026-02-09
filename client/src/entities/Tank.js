@@ -16,6 +16,7 @@ export default class Tank {
     // Tạo container để chứa thân xe
     this.container = scene.add.container(x, y);
     this.container.setSize(40, 40);
+    this.container.tankInstance = this; // Link Tank instance to container
     
     // Bật physics cho container
     scene.physics.world.enable(this.container);
@@ -183,6 +184,37 @@ export default class Tank {
       this.slowTimer = this.scene.time.delayedCall(duration, () => {
           this.movement.resetSpeed();
           this.slowTimer = null;
+      });
+  }
+
+  // Áp dụng Choáng (Stun)
+  applyStun(duration) {
+      // Luôn dừng vận tốc ngay lập tức khi trúng hiệu ứng choáng 
+      // (kể cả khi đã bị choáng trước đó để tránh bị trôi/đẩy)
+      if (this.container.body) {
+          this.container.body.setVelocity(0, 0);
+      }
+
+      if (this.container.isStunned) return; // Nếu đã hiện text "STUNNED" rồi thì thôi
+
+      this.container.isStunned = true;
+      console.log(`${this.container} is Stunned!`);
+
+      // Hiệu ứng Visual (Vòng xoáy trên đầu?)
+      const stunText = this.scene.add.text(0, -60, 'STUNNED!', {
+          fontSize: '16px',
+          color: '#ffff00',
+          fontStyle: 'bold',
+          stroke: '#000000',
+          strokeThickness: 3
+      }).setOrigin(0.5);
+      this.container.add(stunText);
+
+      this.scene.time.delayedCall(duration, () => {
+          if (this.container) {
+              this.container.isStunned = false;
+              if (stunText.active) stunText.destroy();
+          }
       });
   }
 

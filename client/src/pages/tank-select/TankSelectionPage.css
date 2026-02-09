@@ -1,0 +1,299 @@
+/* Tank Selection Page Styles */
+
+.tank-select-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 30px;
+}
+
+/* Header */
+.select-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.select-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+.countdown-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 2px solid;
+}
+
+.countdown-display.normal {
+  border-color: #8b5cf6;
+}
+
+.countdown-display.ranked {
+  border-color: #f43f5e;
+}
+
+.countdown-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.countdown-value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  min-width: 40px;
+  text-align: center;
+}
+
+.countdown-value.warning {
+  color: #fbbf24;
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+.countdown-value.critical {
+  color: #ef4444;
+  animation: pulse 0.3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.countdown-unit {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Tank Cards Grid */
+.tank-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 900px;
+}
+
+.tank-card {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tank-card:hover {
+  transform: translateY(-8px);
+  border-color: #8b5cf6;
+  box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+}
+
+.tank-card.selected {
+  border-color: #10b981;
+  box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+}
+
+.tank-card.selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent);
+  pointer-events: none;
+}
+
+.tank-icon {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.tank-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
+.tank-card:hover .tank-icon {
+  transform: scale(1.1);
+}
+
+.tank-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+/* Tank Stats */
+.tank-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  width: 60px;
+}
+
+.stat-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.stat-fill.hp {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.stat-fill.speed {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.stat-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  width: 40px;
+  text-align: right;
+}
+
+/* Skills */
+.tank-skills {
+  display: flex;
+  gap: 8px;
+}
+
+.skill-badge {
+  padding: 6px 12px;
+  background: rgba(139, 92, 246, 0.3);
+  border: 1px solid #8b5cf6;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a78bfa;
+}
+
+/* Select Indicator */
+.select-indicator {
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  background: #10b981;
+  color: white;
+  font-weight: 700;
+  text-align: center;
+  transition: bottom 0.3s ease;
+}
+
+.tank-card.selected .select-indicator {
+  bottom: 0;
+}
+
+/* Confirm Button */
+.confirm-btn {
+  padding: 18px 48px;
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  border: none;
+  border-radius: 14px;
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  transition: all 0.3s ease;
+}
+
+.confirm-btn.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+}
+
+.confirm-btn.active:hover {
+  transform: scale(1.05) translateY(-3px);
+  box-shadow: 0 12px 40px rgba(16, 185, 129, 0.6);
+}
+
+/* Tips */
+.select-tips {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.select-tips p {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .tank-cards-grid {
+    grid-template-columns: 1fr;
+    max-width: 350px;
+  }
+  
+  .select-title {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 900px) {
+  .tank-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
+  }
+}
