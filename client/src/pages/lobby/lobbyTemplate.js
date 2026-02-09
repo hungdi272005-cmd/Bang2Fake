@@ -20,7 +20,7 @@ export function getLobbyTemplate(user) {
 
     <!-- Top Navigation Tabs -->
     <div class="top-nav">
-      <button class="nav-tab">💎 Nạp lần đầu</button>
+      <button class="nav-tab">💎 Nạp vip</button>
       <button class="nav-tab">📅 Điểm danh</button>
       <button class="nav-tab">🎁 Sự kiện</button>
     </div>
@@ -36,16 +36,16 @@ export function getLobbyTemplate(user) {
 
       <!-- Center Game Modes -->
       <div class="game-modes">
-        <button class="game-mode-btn mode-reward">
+        <button class="game-mode-btn mode-reward" onclick="window.navigateToGameRoom('normal')">
           <span class="mode-title">Đánh thường</span>
         </button>
-        <button class="game-mode-btn mode-ranked">
-          <span class="mode-title">Đánh hảng</span>
+        <button class="game-mode-btn mode-ranked" onclick="window.navigateToGameRoom('ranked')">
+          <span class="mode-title">Đánh hạng</span>
         </button>
-        <button class="game-mode-btn mode-practice">
+        <button class="game-mode-btn mode-practice" onclick="window.navigateToGameRoom('practice')">
           <span class="mode-title">Đấu tập</span>
         </button>
-        <button class="game-mode-btn mode-dungeon">
+        <button class="game-mode-btn mode-dungeon" onclick="window.navigateToGameRoom('dungeon')">
           <span class="mode-title">Phụ bản</span>
         </button>
       </div>

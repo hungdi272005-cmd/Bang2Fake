@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import Projectile from './Projectile';
+import Projectile from '../Projectile';
 
 export default class StandardBullet extends Projectile {
   constructor(scene, x, y, options) {

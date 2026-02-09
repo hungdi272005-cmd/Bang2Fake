@@ -9,7 +9,7 @@ export default {
   color: 0xeeeeee, // White/Silver
   stats: {
     health: 1000,
-    speed: 200
+    speed: 100
   },
   weapon: {
     range: 300,

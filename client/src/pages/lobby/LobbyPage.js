@@ -19,6 +19,14 @@ window.handleLogout = async function() {
   }
 };
 
+// Global navigation to game room
+window.navigateToGameRoom = function(mode) {
+  console.log('🎮 Navigating to game room with mode:', mode);
+  // Lưu mode vào localStorage trước khi navigate
+  localStorage.setItem('gameMode', mode);
+  navigateTo('/game-room');
+};
+
 export function initLobbyPage() {
   const lobbyPage = document.getElementById('lobby-page');
   

@@ -17,13 +17,16 @@ export default class TankMovement {
   update(cursors, wasd) {
     const body = this.container.body;
 
-    // Reset vận tốc
-    body.setVelocity(0);
-
     // Kiểm tra trạng thái bị choáng / Choáng váng
-    if (this.container.isStunned) {
-        return; 
+    // Check cả trên container và instance (nếu có)
+    const isStunned = this.container.isStunned || (this.container.tankInstance && this.container.tankInstance.isStunned);
+    
+    if (isStunned) {
+        return; // Nếu bị choáng, giữ nguyên vận tốc hiện tại (do skill set), không reset về 0
     }
+
+    // Reset vận tốc (chỉ khi không bị choáng và chuẩn bị nhận input mới)
+    body.setVelocity(0);
 
     // Helper check
     const isDown = (inputObj, key) => inputObj && inputObj[key] && inputObj[key].isDown;

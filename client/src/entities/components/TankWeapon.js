@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
-import StandardBullet from '../projectiles/StandardBullet';
-import GundamBullet from '../projectiles/GundamBullet';
-import PhoenixBullet from '../projectiles/PhoenixBullet';
+import StandardBullet from '../projectiles/standardbullet/StandardBullet';
+import GundamBullet from '../projectiles/gundambullet/GundamBullet';
+import PhoenixBullet from '../projectiles/phoenixbullet/PhoenixBullet';
+import KakashiBullet from '../projectiles/kakashibullet/KakashiBullet';
 
 const PROJECTILE_MAP = {
     'standard': StandardBullet,
     'gundam': GundamBullet,
-    'phoenix': PhoenixBullet
+    'phoenix': PhoenixBullet,
+    'kakashi': KakashiBullet
 };
 
 export default class TankWeapon {
@@ -19,6 +21,7 @@ export default class TankWeapon {
     this.bulletSpeed = config.bulletSpeed || 600;
     this.fireRate = config.fireRate || 500; // mili giây
     this.bulletStyle = config.bulletStyle || 'standard'; // 'standard', 'fire'
+    this.damage = config.damage || 20; // Default damage
     this.singleBullet = config.singleBullet || false;
 
     // Tạo tháp pháo
@@ -94,12 +97,30 @@ export default class TankWeapon {
     // Chọn lớp (Class) Đạn dựa trên cấu hình config
     const BulletClass = PROJECTILE_MAP[this.bulletStyle] || StandardBullet;
 
+    // Tính toán sát thương
+    let damage = this.damage;
+    
+    // Check buff từ Tank (ví dụ từ chiêu R của Kakashi)
+    if (this.parentContainer.tankInstance && this.parentContainer.tankInstance.nextAttackDamageBonus) {
+        damage *= 2; // X2 sát thương
+        this.parentContainer.tankInstance.nextAttackDamageBonus = false; // Reset buff
+        console.log("⚡ Enhanced Attack! Damage:", damage);
+        
+        // Hiệu ứng visual cho đạn cường hóa (nếu cần)
+        // Ví dụ: bullet.setScale(1.5); (nhưng cần bullet instance trước)
+    }
+
     // Khởi tạo đạn
     const bullet = new BulletClass(this.scene, spawnX, spawnY, {
         speed: this.bulletSpeed,
         range: this.range,
+        damage: damage, // Truyền damage vào option
         angle: angle
     });
+
+    if (damage > this.damage) {
+        bullet.setScale(1.5); // Đạn to hơn nếu được cường hóa
+    }
 
     // Lưu reference đạn vừa bắn
     this.activeBullet = bullet;
