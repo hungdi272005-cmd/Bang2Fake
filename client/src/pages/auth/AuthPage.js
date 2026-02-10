@@ -3,15 +3,35 @@
  * Trang đăng nhập và đăng ký với toggle
  */
 
-import { login, register } from '../../utils/auth.js';
+import { login, register, loginWithGoogle } from '../../utils/auth.js';
 import { navigateTo } from '../../utils/router.js';
 import { getLoginTemplate } from './loginTemplate.js';
 import { getRegisterTemplate } from './registerTemplate.js';
+import { initGoogleSignIn } from './googleSignIn.js';
 
 export function initAuthPage() {
   // Init both signin and signup pages
   initSigninPage();
   initSignupPage();
+}
+
+/**
+ * Google login handler - dùng chung cho cả signin và signup
+ */
+function handleGoogleLogin() {
+  initGoogleSignIn(async (credential) => {
+    try {
+      const data = await loginWithGoogle(credential);
+      
+      if (data.user.isFirstLogin) {
+        navigateTo('/character-setup');
+      } else {
+        navigateTo('/lobby');
+      }
+    } catch (error) {
+      alert('Đăng nhập Google thất bại: ' + error.message);
+    }
+  });
 }
 
 /**
@@ -64,6 +84,12 @@ function initSigninPage() {
     e.preventDefault();
     navigateTo('/signup');
   });
+
+  // Handle Google login button
+  const googleBtn = signinPage.querySelector('#login-google-btn');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', handleGoogleLogin);
+  }
 }
 
 /**
@@ -128,6 +154,12 @@ function initSignupPage() {
     e.preventDefault();
     navigateTo('/signin');
   });
+
+  // Handle Google login button
+  const googleBtn = signupPage.querySelector('#register-google-btn');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', handleGoogleLogin);
+  }
 }
 
 // Helper functions

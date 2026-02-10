@@ -6,7 +6,8 @@
 import { isAuthenticated } from './auth.js';
 
 const routes = {
-  '/': 'landing',       // Landing page
+  '/': 'landing',                  // Root -> Landing page
+  '/landingpage': 'landing',       // Landing page
   '/signin': 'signin',  // Login page
   '/signup': 'signup',  // Register page
   '/character-setup': 'character-setup', // Character setup page
@@ -35,13 +36,13 @@ export function navigateTo(path) {
  * Render page dựa vào path
  */
 export function renderPage(path) {
-  const pageName = routes[path] || 'signin';
+  const pageName = routes[path] || 'landing';
   
   // Route guards
   if (pageName === 'lobby' || pageName === 'game' || pageName === 'character-setup' || 
       pageName === 'game-room' || pageName === 'matchmaking' || pageName === 'tank-select') {
     if (!isAuthenticated()) {
-      navigateTo('/');
+      navigateTo('/landingpage');
       return;
     }
   }
@@ -83,6 +84,13 @@ export function renderPage(path) {
   if (pageName === 'landing') {
     import('../pages/landing/LandingPage.js').then(module => {
       module.initLandingPage();
+    });
+  }
+  
+  // Signin/Signup pages - re-initialize để reset form state
+  if (pageName === 'signin' || pageName === 'signup') {
+    import('../pages/auth/AuthPage.js').then(module => {
+      module.initAuthPage();
     });
   }
   
@@ -156,7 +164,7 @@ export function initRouter() {
     }
   } else {
     // Default to landing page
-    renderPage('/');
+    renderPage('/landingpage');
   }
 }
 

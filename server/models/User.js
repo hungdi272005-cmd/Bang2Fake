@@ -13,16 +13,23 @@ const userSchema = new mongoose.Schema({
     minlength: [3, 'Tên tài khoản phải có ít nhất 3 ký tự'],
     maxlength: [20, 'Tên tài khoản không được quá 20 ký tự']
   },
+  // Google OAuth fields
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true // Cho phép null (user đăng ký thường không có googleId)
+  },
+  email: {
+    type: String,
+    trim: true
+  },
   phone: {
     type: String,
-    required: [true, 'Vui lòng nhập số điện thoại'],
-    unique: true,
     trim: true,
     match: [/^[0-9]{10,11}$/, 'Số điện thoại phải có 10-11 chữ số']
   },
   password: {
     type: String,
-    required: [true, 'Vui lòng nhập mật khẩu'],
     minlength: [6, 'Mật khẩu phải có ít nhất 6 ký tự'],
     select: false // Không trả về password khi query
   },
@@ -63,14 +70,33 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true
 });
+
+// Sử dụng Partial Filter Expression - Đây là cách chính xác nhất để ignore null trong Unique Index
+userSchema.index(
+  { phone: 1 }, 
+  { 
+    unique: true, 
+    partialFilterExpression: { phone: { $type: "string" } } 
+  }
+);
+
+userSchema.index(
+  { googleId: 1 }, 
+  { 
+    unique: true, 
+    partialFilterExpression: { googleId: { $type: "string" } } 
+  }
+);
 
 /**
  * Middleware: Hash password trước khi lưu vào database
  */
 userSchema.pre('save', async function(next) {
   // Chỉ hash nếu password được thay đổi hoặc user mới
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password) {
     return next();
   }
   

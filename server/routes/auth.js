@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getMe, setupCharacter } = require('../controllers/authController');
+const { register, login, googleLogin, getMe, setupCharacter } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 
 /**
@@ -9,6 +9,13 @@ const { protect } = require('../middleware/auth');
  * @access  Public
  */
 router.post('/register', register);
+
+/**
+ * @route   POST /api/auth/google
+ * @desc    Đăng nhập bằng Google OAuth
+ * @access  Public
+ */
+router.post('/google', googleLogin);
 
 /**
  * @route   POST /api/auth/login

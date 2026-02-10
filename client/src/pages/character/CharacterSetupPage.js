@@ -3,7 +3,7 @@
  * Trang thiết lập nhân vật lần đầu đăng nhập
  */
 
-import { setupCharacter } from '../../utils/auth.js';
+import { setupCharacter, logout } from '../../utils/auth.js';
 import { navigateTo } from '../../utils/router.js';
 import { getCharacterSetupTemplate } from './characterSetupTemplate.js';
 
@@ -73,6 +73,15 @@ export function initCharacterSetupPage() {
       setupBtn.innerHTML = 'Hoàn Tất';
     }
   });
+
+  // Handle logout/switch account
+  const logoutBtn = setupPage.querySelector('#setup-logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      logout();
+    });
+  }
 }
 
 // Helper functions

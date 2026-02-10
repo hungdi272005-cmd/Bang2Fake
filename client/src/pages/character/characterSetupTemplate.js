@@ -52,6 +52,10 @@ export function getCharacterSetupTemplate() {
           <button type="submit" class="btn btn-primary btn-full" id="setup-btn">
             Hoàn Tất
           </button>
+
+          <p class="auth-switch text-center mt-md">
+            Sai tài khoản? <a href="#" class="auth-link" id="setup-logout-btn">Đổi tài khoản khác</a>
+          </p>
         </form>
       </div>
     </div>

@@ -15,7 +15,7 @@ window.handleLogout = async function() {
     console.log('🔵 Logging out...');
     await logout();
     console.log('🔵 Navigating to landing page');
-    navigateTo('/');
+    navigateTo('/landingpage');
   }
 };
 

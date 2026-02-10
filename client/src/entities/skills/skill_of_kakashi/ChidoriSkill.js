@@ -119,7 +119,10 @@ export default class ChidoriSkill extends Skill {
      if (!this.scene.enemies) return;
      
      const enemies = this.scene.enemies.getChildren();
-     const hitRadius = 40; // Bán kính va chạm (Tank size ~40)
+     // Bán kính va chạm dựa trên kích thước VISUAL của tank (displaySize = 90x90)
+     // Mỗi tank rìa = 45px, 2 tank chạm rìa = 45 + 45 = 90px
+     const tankVisualRadius = 45; // Nửa displaySize (90/2)
+     const hitRadius = tankVisualRadius * 2; // Rìa tank chạm rìa tank = 90px
 
      for (const enemyContainer of enemies) {
          // Bỏ qua chính mình
@@ -131,7 +134,15 @@ export default class ChidoriSkill extends Skill {
          );
          
          if (dist <= hitRadius) {
-             // Va chạm!
+             // Va chạm rìa! Đẩy tank lại đúng vị trí rìa chạm rìa
+             const angle = Phaser.Math.Angle.Between(
+                 enemyContainer.x, enemyContainer.y,
+                 this.tankContainer.x, this.tankContainer.y
+             );
+             // Đặt tank dừng lại ở đúng vị trí rìa chạm rìa (cách tâm enemy = hitRadius)
+             this.tankContainer.x = enemyContainer.x + Math.cos(angle) * hitRadius;
+             this.tankContainer.y = enemyContainer.y + Math.sin(angle) * hitRadius;
+
              const enemyTank = enemyContainer.tankInstance;
              
              // Fallback dummy logic (nếu dummy chưa update tankInstance kịp)
@@ -166,11 +177,11 @@ export default class ChidoriSkill extends Skill {
         
         // Gọi hàm applySlow của Tank nếu có
         if (typeof enemy.applySlow === 'function') {
-            enemy.applySlow(50, 1000); // Giảm 50 speed trong 1000ms
+             enemy.applySlow(50, 1500); // Giảm 50 speed trong 1.5 giây
         } else {
             // Fallback chỉnh stats thủ công
              enemy.stats.speed = originalSpeed * 0.5;
-            this.scene.time.delayedCall(1000, () => {
+            this.scene.time.delayedCall(1500, () => {
                 if (enemy && enemy.stats) {
                     enemy.stats.speed = originalSpeed;
                 }
