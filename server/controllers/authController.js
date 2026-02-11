@@ -74,6 +74,8 @@ const register = async (req, res) => {
         stats: user.stats,
         selectedTank: user.selectedTank,
         isFirstLogin: user.isFirstLogin,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds,
         createdAt: user.createdAt
       }
     });
@@ -124,8 +126,11 @@ const login = async (req, res) => {
       });
     }
 
-    // Cập nhật lastLogin
+    // Cập nhật lastLogin & Migration Gold
     user.lastLogin = Date.now();
+    if (user.gold === undefined) {
+      user.gold = 1000;
+    }
     await user.save();
 
     // Tạo token
@@ -144,6 +149,10 @@ const login = async (req, res) => {
         isFirstLogin: user.isFirstLogin,
         stats: user.stats,
         selectedTank: user.selectedTank,
+        vipLevel: user.vipLevel,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds,
+        gold: user.gold === undefined ? 1000 : user.gold,
         lastLogin: user.lastLogin
       }
     });
@@ -167,6 +176,12 @@ const getMe = async (req, res) => {
     // req.user đã được set bởi protect middleware
     const user = await User.findById(req.user.id);
 
+    // Lazy migration: Nếu chưa có gold thì set default
+    if (user && user.gold === undefined) {
+      user.gold = 1000;
+      await user.save(); // Lưu lại vào DB
+    }
+
     res.status(200).json({
       success: true,
       user: {
@@ -175,6 +190,10 @@ const getMe = async (req, res) => {
         phone: user.phone,
         stats: user.stats,
         selectedTank: user.selectedTank,
+        vipLevel: user.vipLevel,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds,
+        gold: user.gold === undefined ? 1000 : user.gold,
         createdAt: user.createdAt,
         lastLogin: user.lastLogin
       }
@@ -246,7 +265,9 @@ const setupCharacter = async (req, res) => {
         displayName: user.displayName,
         isFirstLogin: user.isFirstLogin,
         stats: user.stats,
-        selectedTank: user.selectedTank
+        selectedTank: user.selectedTank,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds
       }
     });
   } catch (error) {
@@ -259,9 +280,111 @@ const setupCharacter = async (req, res) => {
   }
 };
 
+/**
+ * @route   POST /api/auth/google
+ * @desc    Đăng nhập bằng Google OAuth
+ * @access  Public
+ */
+const googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: 'Thiếu Google credential token'
+      });
+    }
+
+    // Verify Google ID token
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+    let payload;
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID
+      });
+      payload = ticket.getPayload();
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        message: 'Google token không hợp lệ'
+      });
+    }
+
+    const { sub: googleId, email, name, picture } = payload;
+
+    // Tìm user theo googleId hoặc email
+    let user = await User.findOne({ 
+      $or: [{ googleId }, { email }] 
+    });
+
+    if (user) {
+      // User đã tồn tại - cập nhật googleId nếu chưa có
+      if (!user.googleId) {
+        user.googleId = googleId;
+      }
+      user.lastLogin = Date.now();
+      await user.save();
+    } else {
+      // Tạo user mới từ Google account
+      // Tạo username unique từ tên Google
+      let baseUsername = name.replace(/\s+/g, '').substring(0, 15);
+      let username = baseUsername;
+      let counter = 1;
+      
+      // Đảm bảo username unique
+      while (await User.findOne({ username })) {
+        username = `${baseUsername}${counter}`;
+        counter++;
+      }
+
+      user = await User.create({
+        username,
+        googleId,
+        email,
+        displayName: name,
+        isFirstLogin: true
+      });
+    }
+
+    // Tạo JWT token
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Đăng nhập Google thành công',
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        displayName: user.displayName,
+        isFirstLogin: user.isFirstLogin,
+        stats: user.stats,
+        selectedTank: user.selectedTank,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds,
+        lastLogin: user.lastLogin
+      }
+    });
+  } catch (error) {
+    console.error('Google login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi đăng nhập Google',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
+  googleLogin,
   getMe,
   setupCharacter
 };

@@ -5,6 +5,7 @@ import InputManager from './components/InputManager';
 import GundamConfig from '../entities/tanks/Gundam'; // Import Định nghĩa Tank
 import PhoenixConfig from '../entities/tanks/Phoenix'; // Import Phoenix
 import KakashiConfig from '../entities/tanks/Kakashi'; // Import Kakashi
+import DeepoolConfig from '../entities/tanks/Deepool'; // Import Deepool
 import BattleMap from '../maps/BattleMap';
 import FPSDisplay from '../trangthai/FPSDisplay';
 import NetworkStatus from '../trangthai/NetworkStatus';
@@ -27,6 +28,7 @@ export default class GameScene extends Phaser.Scene {
     this.load.image('tank_phoenix', 'Pictures_of_phoenix/tank_phoenix.png');
     this.load.image('tank_gundam', 'Pictures_of_gundam/tank_gundam.png');
     this.load.image('tank_kakashi', 'picktures_of_kakashi/tank_kakashi.png');
+    this.load.image('tank_deepool', 'Pictures_of_deepool/tank_deepool.png'); // Load Deepool
     this.load.image('bullet_quickdraw', 'Pictures_of_gundam/Danrutsungnhanh.png');
     this.load.image('skill_laser_blast', 'Pictures_of_gundam/laze.png');
     this.load.image('skill_chidori', 'picktures_of_kakashi/chidori.png');
@@ -47,8 +49,8 @@ export default class GameScene extends Phaser.Scene {
     // --- SPAWN TANK (PLAYER) ---
     const spawnPoints = this.map.getSpawnPoints();
     const spawnPos = spawnPoints.length > 0 ? spawnPoints[0] : { x: 100, y: 100 };
-    // Player: Team 1 - Kakashi
-    const pConfig = { ...KakashiConfig, team: 1 };
+    // Player: Team 1 - Deepool (Testing)
+    const pConfig = { ...DeepoolConfig, team: 1 };
     this.player = new Tank(this, spawnPos.x, spawnPos.y, pConfig);
 
     // --- SPAWN DUMMY ENEMY (Gundam) ---

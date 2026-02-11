@@ -6,7 +6,8 @@
 import { isAuthenticated } from './auth.js';
 
 const routes = {
-  '/': 'landing',       // Landing page
+  '/': 'landing',                  // Root -> Landing page
+  '/landingpage': 'landing',       // Landing page
   '/signin': 'signin',  // Login page
   '/signup': 'signup',  // Register page
   '/character-setup': 'character-setup', // Character setup page
@@ -14,7 +15,8 @@ const routes = {
   '/game-room': 'game-room',      // Game room (chờ tìm trận)
   '/matchmaking': 'matchmaking',  // Matchmaking queue
   '/tank-select': 'tank-select',  // Tank selection
-  '/game': 'game'       // Game page
+  '/game': 'game',      // Game page
+  '/vip': 'vip'          // VIP top-up page
 };
 
 /**
@@ -35,13 +37,13 @@ export function navigateTo(path) {
  * Render page dựa vào path
  */
 export function renderPage(path) {
-  const pageName = routes[path] || 'signin';
+  const pageName = routes[path] || 'landing';
   
   // Route guards
   if (pageName === 'lobby' || pageName === 'game' || pageName === 'character-setup' || 
-      pageName === 'game-room' || pageName === 'matchmaking' || pageName === 'tank-select') {
+      pageName === 'game-room' || pageName === 'matchmaking' || pageName === 'tank-select' || pageName === 'vip') {
     if (!isAuthenticated()) {
-      navigateTo('/');
+      navigateTo('/landingpage');
       return;
     }
   }
@@ -79,10 +81,24 @@ export function renderPage(path) {
       module.initLobbyPage();
     });
   }
+
+  // VIP page
+  if (pageName === 'vip') {
+    import('../pages/vip/VipPage.js').then(module => {
+      module.initVipPage();
+    });
+  }
   
   if (pageName === 'landing') {
     import('../pages/landing/LandingPage.js').then(module => {
       module.initLandingPage();
+    });
+  }
+  
+  // Signin/Signup pages - re-initialize để reset form state
+  if (pageName === 'signin' || pageName === 'signup') {
+    import('../pages/auth/AuthPage.js').then(module => {
+      module.initAuthPage();
     });
   }
   
@@ -156,7 +172,7 @@ export function initRouter() {
     }
   } else {
     // Default to landing page
-    renderPage('/');
+    renderPage('/landingpage');
   }
 }
 

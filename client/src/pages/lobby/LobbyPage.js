@@ -5,6 +5,8 @@
 import { getUser, logout } from '../../utils/auth.js';
 import { navigateTo } from '../../utils/router.js';
 import { getLobbyTemplate } from './lobbyTemplate.js';
+import { initSocket, getSocket } from '../../services/socket.js';
+import { initGlobalChat } from '../chat/GlobalChat.js';
 
 // Store global logout handler
 window.handleLogout = async function() {
@@ -15,7 +17,7 @@ window.handleLogout = async function() {
     console.log('🔵 Logging out...');
     await logout();
     console.log('🔵 Navigating to landing page');
-    navigateTo('/');
+    navigateTo('/landingpage');
   }
 };
 
@@ -36,4 +38,33 @@ export function initLobbyPage() {
 
   // No need to attach event listener here, using onclick in HTML
   console.log('✅ Lobby page initialized with inline event handlers');
+
+  // VIP button
+  const vipBtn = lobbyPage.querySelector('#nav-vip-btn');
+  if (vipBtn) {
+    vipBtn.addEventListener('click', () => {
+      navigateTo('/vip');
+    });
+  }
+
+  // Diamond + button
+  const addDiamondBtn = lobbyPage.querySelector('#add-diamond-btn');
+  if (addDiamondBtn) {
+    addDiamondBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigateTo('/vip');
+    });
+  }
+
+  // Diamond display container
+  const diamondDisplay = lobbyPage.querySelector('#lobby-diamond-display');
+  if (diamondDisplay) {
+    diamondDisplay.addEventListener('click', () => {
+      navigateTo('/vip');
+    });
+    diamondDisplay.style.cursor = 'pointer';
+  }
+
+  // --- GLOBAL CHAT LOGIC ---
+  initGlobalChat(user);
 }
