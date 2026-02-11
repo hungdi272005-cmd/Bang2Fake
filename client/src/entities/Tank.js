@@ -187,6 +187,21 @@ export default class Tank {
       });
   }
 
+  // Áp dụng tăng tốc (Speed Boost)
+  applySpeedBoost(multiplier, duration) {
+      const newSpeed = this.movement.originalSpeed * multiplier;
+      this.movement.setSpeed(newSpeed);
+
+      if (this.speedBoostTimer) {
+          this.speedBoostTimer.remove();
+      }
+
+      this.speedBoostTimer = this.scene.time.delayedCall(duration, () => {
+          this.movement.resetSpeed();
+          this.speedBoostTimer = null;
+      });
+  }
+
   // Áp dụng Choáng (Stun)
   applyStun(duration) {
       // Luôn dừng vận tốc ngay lập tức khi trúng hiệu ứng choáng 

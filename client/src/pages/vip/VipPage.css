@@ -1,0 +1,483 @@
+/* ========================================
+   VIP Page Styles - Premium Design
+   ======================================== */
+
+/* Header */
+.vip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 30px;
+  position: relative;
+  z-index: 10;
+}
+
+.vip-back-btn {
+  background: rgba(255 255 255 / 0.1);
+  border: 1px solid rgba(255 255 255 / 0.2);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.vip-back-btn:hover {
+  background: rgba(255 255 255 / 0.2);
+  transform: translateX(-3px);
+}
+
+.vip-title {
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+.vip-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vip-user-diamonds {
+  background: rgba(255 215 0 / 0.15);
+  border: 1px solid rgba(255 215 0 / 0.3);
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: #ffd700;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.vip-user-level {
+  background: rgba(255 255 255 / 0.1);
+  border: 1px solid rgba(255 255 255 / 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: rgba(255 255 255 / 0.6);
+  font-size: 13px;
+}
+
+.vip-user-level.vip-active {
+  background: linear-gradient(135deg, rgba(255 215 0 / 0.2), rgba(255 140 0 / 0.2));
+  border-color: rgba(255 215 0 / 0.5);
+  color: #ffd700;
+  font-weight: 600;
+}
+
+/* VIP Cards Grid */
+.vip-packages {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 24px;
+  padding: 20px 40px 40px;
+  position: relative;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+.vip-card {
+  position: relative;
+  background: rgba(255 255 255 / 0.06);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255 255 255 / 0.1);
+  padding: 30px 24px;
+  width: 280px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.vip-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 20px 20px 0 0;
+}
+
+.vip-card-1::before { background: linear-gradient(90deg, #cd853f, #daa520); }
+.vip-card-2::before { background: linear-gradient(90deg, #4a9eff, #7c4dff); }
+.vip-card-3::before { background: linear-gradient(90deg, #ff4444, #ff8800); }
+
+.vip-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(255 255 255 / 0.3);
+  box-shadow: 0 20px 60px rgba(0 0 0 / 0.4);
+}
+
+.vip-card-2 {
+  border-color: rgba(74 158 255 / 0.3);
+  transform: scale(1.05);
+}
+
+.vip-card-2:hover {
+  transform: translateY(-8px) scale(1.07);
+}
+
+/* Badge */
+.vip-card-badge {
+  position: absolute;
+  top: 16px;
+  right: -8px;
+  background: rgba(255 255 255 / 0.15);
+  color: white;
+  padding: 4px 16px 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-radius: 4px 0 0 4px;
+}
+
+.vip-badge-hot {
+  background: linear-gradient(135deg, #4a9eff, #7c4dff);
+}
+
+.vip-badge-legend {
+  background: linear-gradient(135deg, #ff4444, #ff8800);
+}
+
+/* Card Content */
+.vip-card-icon {
+  font-size: 48px;
+  margin: 16px 0 8px;
+}
+
+.vip-card-name {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+}
+
+.vip-card-subtitle {
+  font-size: 14px;
+  color: rgba(255 255 255 / 0.5);
+  margin: 4px 0 16px;
+}
+
+.vip-card-price {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 12px 0;
+}
+
+.vip-card-1 .vip-card-price { color: #daa520; }
+.vip-card-2 .vip-card-price { color: #6aadff; }
+.vip-card-3 .vip-card-price { color: #ff6b6b; }
+
+/* Benefits List */
+.vip-card-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 24px;
+  text-align: left;
+}
+
+.vip-card-benefits li {
+  color: rgba(255 255 255 / 0.8);
+  padding: 6px 0;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255 255 255 / 0.05);
+}
+
+.vip-card-benefits li:last-child {
+  border-bottom: none;
+}
+
+.text-gold { color: #ffd700; font-weight: 600; }
+.text-blue { color: #6aadff; font-weight: 600; }
+.text-red { color: #ff6b6b; font-weight: 600; }
+
+/* Buy Button */
+.vip-buy-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #cd853f, #daa520);
+  color: white;
+}
+
+.vip-buy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(205 133 63 / 0.4);
+}
+
+.vip-buy-hot {
+  background: linear-gradient(135deg, #4a9eff, #7c4dff);
+}
+
+.vip-buy-hot:hover {
+  box-shadow: 0 8px 25px rgba(74 158 255 / 0.4);
+}
+
+.vip-buy-legend {
+  background: linear-gradient(135deg, #ff4444, #ff8800);
+}
+
+.vip-buy-legend:hover {
+  box-shadow: 0 8px 25px rgba(255 68 68 / 0.4);
+}
+
+/* ========================================
+   Payment Modal
+   ======================================== */
+.payment-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0 0 0 / 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.payment-modal-content {
+  background: linear-gradient(145deg, #1e1e2e, #2a2a3e);
+  border: 1px solid rgba(255 255 255 / 0.1);
+  border-radius: 20px;
+  padding: 32px;
+  width: 440px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.payment-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255 255 255 / 0.1);
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.payment-close-btn:hover {
+  background: rgba(255 68 68 / 0.3);
+  transform: rotate(90deg);
+}
+
+.payment-title {
+  text-align: center;
+  font-size: 22px;
+  color: white;
+  margin: 0 0 20px;
+}
+
+/* Package Info in Modal */
+.payment-package-info {
+  background: rgba(255 255 255 / 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.payment-package-info .pkg-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.payment-package-info .pkg-diamonds {
+  font-size: 14px;
+  color: rgba(255 255 255 / 0.6);
+  margin-top: 4px;
+}
+
+/* Bank Info */
+.payment-bank-info {
+  margin-bottom: 20px;
+}
+
+.payment-bank-info h3 {
+  color: white;
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.bank-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255 255 255 / 0.06);
+}
+
+.bank-detail:last-child {
+  border-bottom: none;
+}
+
+.bank-label {
+  color: rgba(255 255 255 / 0.5);
+  font-size: 13px;
+}
+
+.bank-value {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.bank-value.copyable {
+  cursor: pointer;
+  padding: 4px 10px;
+  background: rgba(255 255 255 / 0.08);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.bank-value.copyable:hover {
+  background: rgba(74 158 255 / 0.2);
+}
+
+.bank-value.copyable:active {
+  transform: scale(0.95);
+}
+
+.bank-detail-important {
+  background: rgba(255 215 0 / 0.08);
+  border-radius: 8px;
+  margin-top: 8px;
+  border: 1px solid rgba(255 215 0 / 0.15);
+}
+
+.bank-detail-important .bank-value {
+  color: #ffd700;
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
+/* QR Code */
+.payment-qr {
+  text-align: center;
+  margin: 16px 0;
+}
+
+.payment-qr img {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  background: white;
+  padding: 8px;
+}
+
+/* Note */
+.payment-note {
+  background: rgba(255 152 0 / 0.1);
+  border: 1px solid rgba(255 152 0 / 0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.payment-note p {
+  color: rgba(255 255 255 / 0.8);
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+/* Status */
+.payment-status {
+  text-align: center;
+  padding: 12px;
+}
+
+.status-pending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.status-pending p {
+  color: rgba(255 255 255 / 0.6);
+  font-size: 14px;
+  margin: 0;
+}
+
+.spinner-large {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255 255 255 / 0.1);
+  border-top-color: #4a9eff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Status: Success */
+.status-success {
+  color: #4ade80;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.status-success .success-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .vip-packages {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .vip-card {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .vip-card-2 {
+    transform: scale(1);
+  }
+
+  .vip-card-2:hover {
+    transform: translateY(-8px) scale(1.02);
+  }
+}

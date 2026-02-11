@@ -16,8 +16,7 @@ const userSchema = new mongoose.Schema({
   // Google OAuth fields
   googleId: {
     type: String,
-    unique: true,
-    sparse: true // Cho phép null (user đăng ký thường không có googleId)
+    // Index được định nghĩa bên dưới với partialFilterExpression
   },
   email: {
     type: String,
@@ -56,6 +55,28 @@ const userSchema = new mongoose.Schema({
     losses: { type: Number, default: 0 },
     kills: { type: Number, default: 0 },
     deaths: { type: Number, default: 0 }
+  },
+  // VIP fields
+  vipLevel: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 3
+  },
+  gold: {
+    type: Number,
+    default: 1000, // Tặng 1000 vàng mặc định
+    min: 0
+  },
+  diamonds: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  totalDeposited: {
+    type: Number,
+    default: 0, // Tổng tiền đã nạp (VND)
+    min: 0
   },
   selectedTank: {
     type: String,

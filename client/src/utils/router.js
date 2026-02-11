@@ -15,7 +15,8 @@ const routes = {
   '/game-room': 'game-room',      // Game room (chờ tìm trận)
   '/matchmaking': 'matchmaking',  // Matchmaking queue
   '/tank-select': 'tank-select',  // Tank selection
-  '/game': 'game'       // Game page
+  '/game': 'game',      // Game page
+  '/vip': 'vip'          // VIP top-up page
 };
 
 /**
@@ -40,7 +41,7 @@ export function renderPage(path) {
   
   // Route guards
   if (pageName === 'lobby' || pageName === 'game' || pageName === 'character-setup' || 
-      pageName === 'game-room' || pageName === 'matchmaking' || pageName === 'tank-select') {
+      pageName === 'game-room' || pageName === 'matchmaking' || pageName === 'tank-select' || pageName === 'vip') {
     if (!isAuthenticated()) {
       navigateTo('/landingpage');
       return;
@@ -78,6 +79,13 @@ export function renderPage(path) {
   if (pageName === 'lobby') {
     import('../pages/lobby/LobbyPage.js').then(module => {
       module.initLobbyPage();
+    });
+  }
+
+  // VIP page
+  if (pageName === 'vip') {
+    import('../pages/vip/VipPage.js').then(module => {
+      module.initVipPage();
     });
   }
   

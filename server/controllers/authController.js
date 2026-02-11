@@ -74,6 +74,8 @@ const register = async (req, res) => {
         stats: user.stats,
         selectedTank: user.selectedTank,
         isFirstLogin: user.isFirstLogin,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds,
         createdAt: user.createdAt
       }
     });
@@ -124,8 +126,11 @@ const login = async (req, res) => {
       });
     }
 
-    // Cập nhật lastLogin
+    // Cập nhật lastLogin & Migration Gold
     user.lastLogin = Date.now();
+    if (user.gold === undefined) {
+      user.gold = 1000;
+    }
     await user.save();
 
     // Tạo token
@@ -144,6 +149,10 @@ const login = async (req, res) => {
         isFirstLogin: user.isFirstLogin,
         stats: user.stats,
         selectedTank: user.selectedTank,
+        vipLevel: user.vipLevel,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds,
+        gold: user.gold === undefined ? 1000 : user.gold,
         lastLogin: user.lastLogin
       }
     });
@@ -167,6 +176,12 @@ const getMe = async (req, res) => {
     // req.user đã được set bởi protect middleware
     const user = await User.findById(req.user.id);
 
+    // Lazy migration: Nếu chưa có gold thì set default
+    if (user && user.gold === undefined) {
+      user.gold = 1000;
+      await user.save(); // Lưu lại vào DB
+    }
+
     res.status(200).json({
       success: true,
       user: {
@@ -175,6 +190,10 @@ const getMe = async (req, res) => {
         phone: user.phone,
         stats: user.stats,
         selectedTank: user.selectedTank,
+        vipLevel: user.vipLevel,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds,
+        gold: user.gold === undefined ? 1000 : user.gold,
         createdAt: user.createdAt,
         lastLogin: user.lastLogin
       }
@@ -246,7 +265,9 @@ const setupCharacter = async (req, res) => {
         displayName: user.displayName,
         isFirstLogin: user.isFirstLogin,
         stats: user.stats,
-        selectedTank: user.selectedTank
+        selectedTank: user.selectedTank,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds
       }
     });
   } catch (error) {
@@ -345,6 +366,8 @@ const googleLogin = async (req, res) => {
         isFirstLogin: user.isFirstLogin,
         stats: user.stats,
         selectedTank: user.selectedTank,
+        vipLevel: user.vipLevel,
+        diamonds: user.diamonds,
         lastLogin: user.lastLogin
       }
     });
