@@ -1,0 +1,311 @@
+/* ============================================
+   SPIN WHEEL (Vòng Quay) - Premium Design
+   ============================================ */
+
+/* === Overlay === */
+.spin-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spinFadeIn 0.3s ease;
+}
+
+@keyframes spinFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* === Modal Container === */
+.spin-modal {
+  background: linear-gradient(145deg, rgba(12, 12, 30, 0.98), rgba(6, 6, 20, 0.99));
+  border: 1px solid rgba(120, 80, 255, 0.2);
+  border-radius: 24px;
+  padding: 28px 24px;
+  width: 92%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(100, 50, 200, 0.15), 0 20px 60px rgba(0, 0, 0, 0.6);
+  animation: spinSlideUp 0.4s ease;
+  position: relative;
+}
+
+@keyframes spinSlideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* === Header === */
+.spin-header {
+  margin-bottom: 20px;
+}
+
+.spin-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 6px 0;
+  text-shadow: 0 0 20px rgba(150, 100, 255, 0.5);
+}
+
+.spin-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+.spin-orb-count {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 16px;
+  background: linear-gradient(135deg, rgba(150, 50, 255, 0.15), rgba(100, 50, 200, 0.15));
+  border: 1px solid rgba(150, 80, 255, 0.3);
+  border-radius: 20px;
+  font-size: 13px;
+  color: #c084fc;
+}
+
+/* === Close Button === */
+.spin-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+  z-index: 10;
+}
+
+.spin-close-btn:hover {
+  color: #fff;
+}
+
+/* === Wheel Container === */
+.spin-wheel-container {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  margin: 0 auto 20px;
+}
+
+/* === Pointer (mũi tên ở 12 giờ) === */
+.spin-pointer {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 28px solid #ffd700;
+  filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.5));
+}
+
+/* === Wheel === */
+.spin-wheel {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  border: 4px solid rgba(150, 100, 255, 0.4);
+  box-shadow: 0 0 30px rgba(100, 50, 200, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.3);
+  transition: none;
+}
+
+/* === Wheel Segments === */
+.spin-segment {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 0;
+  left: 50%;
+  transform-origin: 0% 100%;
+  /* Mỗi segment chiếm 45deg (360/8) */
+  clip-path: polygon(0% 100%, 100% 0%, 0% 0%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spin-segment-content {
+  position: absolute;
+  top: 28%;
+  left: 10%;
+  transform: rotate(-22.5deg);
+  text-align: center;
+  width: 60px;
+}
+
+.spin-segment-icon {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.spin-segment-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 1.2;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Segment colors */
+.spin-segment:nth-child(1) { background: linear-gradient(135deg, #ffd700, #ffaa00); transform: rotate(-22.5deg) skewY(-45deg); }
+.spin-segment:nth-child(2) { background: linear-gradient(135deg, #a78bfa, #7c3aed); transform: rotate(22.5deg) skewY(-45deg); }
+.spin-segment:nth-child(3) { background: linear-gradient(135deg, #60a5fa, #3b82f6); transform: rotate(67.5deg) skewY(-45deg); }
+.spin-segment:nth-child(4) { background: linear-gradient(135deg, #f472b6, #ec4899); transform: rotate(112.5deg) skewY(-45deg); }
+.spin-segment:nth-child(5) { background: linear-gradient(135deg, #34d399, #10b981); transform: rotate(157.5deg) skewY(-45deg); }
+.spin-segment:nth-child(6) { background: linear-gradient(135deg, #fb923c, #f97316); transform: rotate(202.5deg) skewY(-45deg); }
+.spin-segment:nth-child(7) { background: linear-gradient(135deg, #f87171, #ef4444); transform: rotate(247.5deg) skewY(-45deg); }
+.spin-segment:nth-child(8) { background: linear-gradient(135deg, #38bdf8, #0ea5e9); transform: rotate(292.5deg) skewY(-45deg); }
+
+/* === Center Button === */
+.spin-center-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #6366f1, #7c3aed);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.spin-center-btn:hover:not(:disabled) {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 6px 30px rgba(99, 102, 241, 0.7);
+}
+
+.spin-center-btn:disabled {
+  background: rgba(60, 60, 80, 0.8);
+  border-color: rgba(100, 100, 120, 0.3);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* === Spin Glow Effect === */
+.spin-wheel-container::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent, rgba(255, 215, 0, 0.15), transparent, rgba(150, 100, 255, 0.15),
+    transparent, rgba(255, 100, 100, 0.15), transparent, rgba(100, 200, 255, 0.15),
+    transparent
+  );
+  z-index: -1;
+  animation: glowSpin 8s linear infinite;
+}
+
+@keyframes glowSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* === Result Popup === */
+.spin-result-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, rgba(25, 25, 55, 0.98), rgba(12, 12, 35, 0.99));
+  border: 1px solid rgba(255, 200, 50, 0.35);
+  border-radius: 16px;
+  padding: 30px 40px;
+  text-align: center;
+  z-index: 10001;
+  animation: rewardPop 0.4s ease;
+  box-shadow: 0 0 50px rgba(255, 200, 50, 0.15);
+}
+
+@keyframes rewardPop {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  70% { transform: translate(-50%, -50%) scale(1.05); }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.spin-result-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.spin-result-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffd966;
+  margin-bottom: 6px;
+}
+
+.spin-result-value {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 16px;
+}
+
+.spin-result-ok {
+  padding: 8px 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.spin-result-ok:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* === Responsive === */
+@media (max-width: 420px) {
+  .spin-wheel-container {
+    width: 280px;
+    height: 280px;
+  }
+  .spin-wheel {
+    width: 280px;
+    height: 280px;
+  }
+  .spin-modal {
+    padding: 20px 16px;
+  }
+  .spin-center-btn {
+    width: 65px;
+    height: 65px;
+    font-size: 12px;
+  }
+}

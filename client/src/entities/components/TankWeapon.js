@@ -23,6 +23,7 @@ export default class TankWeapon {
     this.bulletStyle = config.bulletStyle || 'standard'; // 'standard', 'fire'
     this.damage = config.damage || 20; // Default damage
     this.singleBullet = config.singleBullet || false;
+    this.critChance = config.critChance || 0;  // % cơ hội bạo kích từ ngọc
 
     // Tạo tháp pháo
     // Tháp pháo là một sprite riêng biệt bám theo vị trí container
@@ -99,6 +100,13 @@ export default class TankWeapon {
 
     // Tính toán sát thương
     let damage = this.damage;
+    let isCrit = false;
+    
+    // Check bạo kích từ ngọc
+    if (this.critChance > 0 && Math.random() * 100 < this.critChance) {
+      damage = Math.round(damage * 1.5);
+      isCrit = true;
+    }
     
     // Check buff từ Tank (ví dụ từ chiêu R của Kakashi)
     if (this.parentContainer.tankInstance && this.parentContainer.tankInstance.nextAttackDamageBonus) {
@@ -120,6 +128,13 @@ export default class TankWeapon {
 
     if (damage > this.damage) {
         bullet.setScale(1.5); // Đạn to hơn nếu được cường hóa
+    }
+    
+    // Đạn bạo kích: tô vàng + to hơn chút
+    if (isCrit) {
+      bullet.setTint?.(0xffaa00);
+      bullet.setScale(bullet.scaleX * 1.2);
+      console.log(`💥 CRIT! Damage: ${damage}`);
     }
 
     // Lưu reference đạn vừa bắn
