@@ -110,6 +110,14 @@ export function initLobbyPage() {
     diamondDisplay.style.cursor = 'pointer';
   }
 
+  // Event button
+  const eventBtn = lobbyPage.querySelector('#nav-event-btn');
+  if (eventBtn) {
+    eventBtn.addEventListener('click', () => {
+      navigateTo('/events');
+    });
+  }
+
   // --- GLOBAL CHAT LOGIC ---
   initGlobalChat(user);
 }

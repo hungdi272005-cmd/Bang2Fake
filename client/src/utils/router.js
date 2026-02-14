@@ -16,7 +16,8 @@ const routes = {
   '/matchmaking': 'matchmaking',  // Matchmaking queue
   '/tank-select': 'tank-select',  // Tank selection
   '/game': 'game',      // Game page
-  '/vip': 'vip'          // VIP top-up page
+  '/vip': 'vip',          // VIP top-up page
+  '/events': 'events'    // Events page
 };
 
 /**
@@ -41,7 +42,7 @@ export function renderPage(path) {
   
   // Route guards
   if (pageName === 'lobby' || pageName === 'game' || pageName === 'character-setup' || 
-      pageName === 'game-room' || pageName === 'matchmaking' || pageName === 'tank-select' || pageName === 'vip') {
+      pageName === 'game-room' || pageName === 'matchmaking' || pageName === 'tank-select' || pageName === 'vip' || pageName === 'events') {
     if (!isAuthenticated()) {
       navigateTo('/landingpage');
       return;
@@ -65,6 +66,11 @@ export function renderPage(path) {
     window.cleanupMatchmakingTimer();
   }
   
+  // Cleanup event page timer nếu đang chạy
+  if (pageName !== 'events' && typeof window.cleanupEventPage === 'function') {
+    window.cleanupEventPage();
+  }
+  
   // Cleanup tank selection timer nếu đang chạy
   if (pageName !== 'tank-select' && typeof window.cleanupTankSelectionTimer === 'function') {
     window.cleanupTankSelectionTimer();
@@ -86,6 +92,14 @@ export function renderPage(path) {
   if (pageName === 'vip') {
     import('../pages/vip/VipPage.js').then(module => {
       module.initVipPage();
+    });
+  }
+
+  // Events page
+  if (pageName === 'events') {
+    import('../pages/event/EventPage.js').then(module => {
+      module.initEventPage();
+      window.cleanupEventPage = module.cleanupEventPage;
     });
   }
   
