@@ -22,7 +22,7 @@ export function getLobbyTemplate(user) {
     <div class="top-nav">
       <button class="nav-tab" id="nav-vip-btn">💎 Nạp vip</button>
       <button class="nav-tab" id="nav-checkin-btn">📅 Điểm danh</button>
-      <button class="nav-tab">🎁 Sự kiện</button>
+      <button class="nav-tab" id="nav-event-btn">🎁 Sự kiện</button>
     </div>
 
     <!-- Currency Display -->

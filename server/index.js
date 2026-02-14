@@ -48,6 +48,10 @@ app.use('/api/spin', spinRoutes);
 const runeRoutes = require('./routes/rune');
 app.use('/api/runes', runeRoutes);
 
+// Event routes
+const eventRoutes = require('./routes/event');
+app.use('/api/events', eventRoutes);
+
 // Socket.io setup với CORS
 const io = new Server(server, {
   cors: {
