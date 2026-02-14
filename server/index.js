@@ -36,6 +36,14 @@ app.use('/api/auth', authRoutes);
 const paymentRoutes = require('./routes/payment');
 app.use('/api/payment', paymentRoutes);
 
+// Rune routes
+// const runeRoutes = require('./routes/rune');
+// app.use('/api/runes', runeRoutes);
+
+// Event routes
+const eventRoutes = require('./routes/event');
+app.use('/api/events', eventRoutes);
+
 // Socket.io setup với CORS
 const io = new Server(server, {
   cors: {
