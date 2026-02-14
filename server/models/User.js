@@ -78,10 +78,60 @@ const userSchema = new mongoose.Schema({
     default: 0, // Tổng tiền đã nạp (VND)
     min: 0
   },
+  // Check-in (Điểm danh) fields
+  checkin: {
+    lastCheckinDate: { type: Date, default: null },
+    checkedDays: { type: [Number], default: [] },  // Mảng các ngày đã điểm danh (VD: [1, 3, 5, 12])
+    currentMonth: { type: Number, default: 0 },
+    currentYear: { type: Number, default: 0 },
+    totalCheckins: { type: Number, default: 0 },
+    claimedMilestones: { type: [Number], default: [] }
+  },
+  // Vật phẩm đặc biệt
+  mysteryOrbs: {
+    type: Number,
+    default: 0, // Bóng thần bí (dùng để quay vòng quay)
+    min: 0
+  },
+  tankEggs: {
+    type: Number,
+    default: 0, // Trứng tank (mở ra tank ngẫu nhiên)
+    min: 0
+  },
   selectedTank: {
     type: String,
     default: 'Gundam',
-    enum: ['Gundam', 'Phoenix', 'Kakashi'] // Các tanks có sẵn
+    enum: ['Gundam', 'Phoenix', 'Kakashi', 'Deepool']
+  },
+  // ==================== HỆ THỐNG NGỌC ====================
+  runeInventory: {
+    type: Map,
+    of: Number,
+    default: () => new Map([
+      // Tier 1: 10 viên mỗi loại
+      ['atk_1', 10], ['def_1', 10], ['spd_1', 10], ['crit_1', 10], ['vamp_1', 10], ['all_1', 10],
+      // Tier 2: 3 viên mỗi loại
+      ['atk_2', 3], ['def_2', 3], ['spd_2', 3], ['crit_2', 3], ['vamp_2', 3], ['all_2', 3],
+      // Tier 3: 0 viên (phải nâng cấp)
+      ['atk_3', 0], ['def_3', 0], ['spd_3', 0], ['crit_3', 0], ['vamp_3', 0], ['all_3', 0],
+    ])
+  },
+  runePages: {
+    type: [{
+      pageId: { type: String, required: true },
+      name: { type: String, maxlength: 20, default: 'Trang 1' },
+      slots: { type: [String], default: [null, null, null, null, null, null] }
+    }],
+    default: [{
+      pageId: 'page_1',
+      name: 'Tấn Công',
+      slots: [null, null, null, null, null, null]
+    }]
+  },
+  tankRuneMapping: {
+    type: Map,
+    of: String,  // tankId → pageId
+    default: () => new Map()
   },
   createdAt: {
     type: Date,

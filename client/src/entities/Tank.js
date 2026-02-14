@@ -12,6 +12,10 @@ export default class Tank {
     
     // Chỉ số mặc định nếu không được cung cấp
     const stats = config.stats || { speed: 200, health: 1000 }; // Thêm máu mặc định
+  
+  // Chỉ số từ ngọc phù trợ
+  this.defense = stats.defense || 0;       // % giảm sát thương nhận
+  this.vampirism = stats.vampirism || 0;   // % hút máu khi gây sát thương
     
     // Tạo container để chứa thân xe
     this.container = scene.add.container(x, y);
@@ -104,10 +108,12 @@ export default class Tank {
 
   // Xử lý sát thương
   takeDamage(amount) {
-    const remaining = this.health.takeDamage(amount);
+    // Áp dụng giảm sát thương từ ngọc Phòng Thủ
+    const reducedAmount = Math.round(amount * (1 - (this.defense || 0) / 100));
+    const remaining = this.health.takeDamage(reducedAmount);
     
     // Hiển thị số dame
-    this.showDamagePopup(amount);
+    this.showDamagePopup(reducedAmount);
 
     if (remaining <= 0) {
       // Logic chết (tương lai)

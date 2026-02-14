@@ -15,11 +15,12 @@ export default class DeepoolSkillE extends Skill {
     this.markDuration = 4000; // 3.5 seconds
     
     // Projectile properties
-    this.projectileSpeed = 1000; // Increased speed for range 600
-    this.projectileRange = 350; // Reset range to 300
-    this.maxTeleportRange = 370; // Max range to activate E2 (Updated to 370)
-    this.damageE1 = 50; // Damage for E1 (Mark)
-    this.damage = 100; // Damage for E2 (Teleport)
+    this.projectileSpeed = 1000;
+    this.projectileRange = 350;
+    this.maxTeleportRange = 370;
+    this.damageE1 = 50;
+    this.damage = 100;
+    this.isProjectileActive = false; // Chặn bắn nhiều đạn E1 cùng lúc
   }
 
   // Override to check stage logic
@@ -37,6 +38,9 @@ export default class DeepoolSkillE extends Skill {
         }
         return true;
     }
+    
+    // Chặn E1 nếu đạn đang bay
+    if (this.isProjectileActive) return false;
     
     return super.canUse();
   }
@@ -82,6 +86,7 @@ export default class DeepoolSkillE extends Skill {
 
   executeStage1(tankContainer) {
     console.log("Deepool Skill E: Stage 1 - Throwing Mark");
+    this.isProjectileActive = true; // Khóa không cho bắn thêm
     
     // Create Projectile
     const pointer = this.scene.input.activePointer;
@@ -109,6 +114,7 @@ export default class DeepoolSkillE extends Skill {
     // Hàm dọn dẹp
     const cleanup = () => {
         projectile.isActive = false;
+        this.isProjectileActive = false; // Mở khóa khi đạn biến mất
         if (projectile.active) projectile.destroy();
         if (enemyCollider) enemyCollider.destroy();
         if (wallCollider) wallCollider.destroy();
