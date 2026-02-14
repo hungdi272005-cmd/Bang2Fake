@@ -9,6 +9,8 @@ import DeepoolConfig from '../entities/tanks/Deepool'; // Import Deepool
 import BattleMap from '../maps/BattleMap';
 import FPSDisplay from '../trangthai/FPSDisplay';
 import NetworkStatus from '../trangthai/NetworkStatus';
+import { applyRuneStatsToConfig } from '../utils/runeStats.js';
+import { fetchRuneData } from '../pages/rune-board/runeApi.js';
   
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -49,9 +51,13 @@ export default class GameScene extends Phaser.Scene {
     // --- SPAWN TANK (PLAYER) ---
     const spawnPoints = this.map.getSpawnPoints();
     const spawnPos = spawnPoints.length > 0 ? spawnPoints[0] : { x: 100, y: 100 };
-    // Player: Team 1 - Deepool (Testing)
+
+    // Tạo tank với base stats trước
     const pConfig = { ...DeepoolConfig, team: 1 };
     this.player = new Tank(this, spawnPos.x, spawnPos.y, pConfig);
+
+    // Load rune data bất đồng bộ → áp dụng sau khi load xong
+    this.loadAndApplyRunes(pConfig);
 
     // --- SPAWN DUMMY ENEMY (Gundam) ---
     // Spawn cách player một đoạn
@@ -174,6 +180,44 @@ export default class GameScene extends Phaser.Scene {
     // --- TRẠNG THÁI (Status) ---
     this.fpsDisplay = new FPSDisplay(this, 10, 10);
     this.networkStatus = new NetworkStatus(this, 10, 40);
+  }
+
+  /**
+   * Load rune data từ server và áp dụng vào player tank (chạy bất đồng bộ)
+   * Hot-patch stats trực tiếp lên Tank đã tạo
+   */
+  async loadAndApplyRunes(baseConfig) {
+    try {
+      const runeData = await fetchRuneData();
+      const tankId = (baseConfig.name || '').toLowerCase();
+      const assignedPageId = runeData.tankMapping?.[tankId];
+      if (!assignedPageId) return;
+
+      const assignedPage = runeData.pages.find(p => p.pageId === assignedPageId);
+      if (!assignedPage || !assignedPage.slots) return;
+
+      const buffedConfig = applyRuneStatsToConfig(baseConfig, assignedPage.slots);
+
+      // Hot-patch stats lên player đang chạy
+      if (this.player) {
+        // Speed
+        if (buffedConfig.stats.speed && this.player.movement) {
+          this.player.movement.speed = buffedConfig.stats.speed;
+        }
+        // Defense
+        this.player.defense = buffedConfig.stats.defense || 0;
+        // Vampirism
+        this.player.vampirism = buffedConfig.stats.vampirism || 0;
+        // Weapon damage + crit
+        if (this.player.weapon && buffedConfig.weapon) {
+          this.player.weapon.damage = buffedConfig.weapon.damage || this.player.weapon.damage;
+          this.player.weapon.critChance = buffedConfig.weapon.critChance || 0;
+        }
+        console.log('💎 Rune stats applied:', buffedConfig.stats, buffedConfig.weapon);
+      }
+    } catch (err) {
+      console.warn('⚠️ Could not load rune data, using base stats:', err.message);
+    }
   }
 
   update(time, delta) {

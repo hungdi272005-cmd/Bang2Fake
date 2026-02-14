@@ -21,8 +21,8 @@ export function getLobbyTemplate(user) {
     <!-- Top Navigation Tabs -->
     <div class="top-nav">
       <button class="nav-tab" id="nav-vip-btn">💎 Nạp vip</button>
-      <button class="nav-tab">📅 Điểm danh</button>
-      <button class="nav-tab" id="nav-event-btn">🎁 Sự kiện</button>
+      <button class="nav-tab" id="nav-checkin-btn">📅 Điểm danh</button>
+      <button class="nav-tab">🎁 Sự kiện</button>
     </div>
 
     <!-- Currency Display -->
@@ -86,9 +86,10 @@ export function getLobbyTemplate(user) {
 
     <!-- Bottom Right Buttons -->
     <div class="bottom-right-nav">
-      <button class="nav-btn">Cửa hàng</button>
+      <button class="nav-btn" id="shop-btn">🏪 Cửa hàng</button>
+      <button class="nav-btn" id="tank-collection-btn">🔫 Tank</button>
       <button class="nav-btn">Túi đồ</button>
-      <button class="nav-btn">BảngNgọc</button>
+      <button class="nav-btn" id="rune-board-btn">💎 Bảng Ngọc</button>
       <button class="nav-btn">Trợ thủ</button>
     </div>
   `;

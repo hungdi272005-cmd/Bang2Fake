@@ -1,0 +1,744 @@
+/* ============================
+   Rune Board Modal Styles
+   Bảng Ngọc - Glassmorphism dark theme
+   ============================ */
+
+/* Overlay */
+.rb-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: rbFadeIn 0.3s ease-out;
+}
+
+@keyframes rbFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rbFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes rbSlideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes rbPulse {
+  0%, 100% { box-shadow: 0 0 5px var(--slot-color), inset 0 0 5px rgba(255,255,255,0.05); }
+  50% { box-shadow: 0 0 20px var(--slot-color), inset 0 0 10px rgba(255,255,255,0.1); }
+}
+
+@keyframes rbShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+.rb-shake {
+  animation: rbShake 0.4s ease-out;
+}
+
+/* Modal */
+.rb-modal {
+  width: 92%;
+  max-width: 950px;
+  max-height: 88vh;
+  background: linear-gradient(135deg, rgba(10, 10, 30, 0.97), rgba(20, 20, 55, 0.97));
+  border: 2px solid rgba(99, 102, 241, 0.4);
+  border-radius: 20px;
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.6),
+    0 0 50px rgba(99, 102, 241, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: rbSlideUp 0.3s ease-out;
+}
+
+/* Header */
+.rb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+  border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.rb-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  letter-spacing: 1px;
+}
+
+.rb-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(239, 68, 68, 0.3);
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rb-close-btn:hover {
+  background: rgba(239, 68, 68, 0.7);
+  border-color: #ef4444;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+}
+
+/* Body - 2 columns */
+.rb-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ===== SIDEBAR ===== */
+.rb-sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: rgba(0, 0, 0, 0.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
+
+.rb-sidebar-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #a5b4fc;
+  margin-bottom: 4px;
+}
+
+/* Page Tabs */
+.rb-page-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rb-page-tab {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #a0a0b8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.rb-page-tab:hover {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: white;
+}
+
+.rb-page-tab.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
+  border-color: #6366f1;
+  color: white;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.25);
+}
+
+.rb-page-name {
+  font-weight: 700;
+}
+
+.rb-page-slots {
+  font-size: 11px;
+  color: #6b7280;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.rb-page-tab.active .rb-page-slots {
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.2);
+}
+
+/* Add Page Button */
+.rb-add-page-btn {
+  width: 100%;
+  padding: 8px 14px;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.rb-add-page-btn:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* Stats Summary */
+.rb-stats-summary {
+  margin-top: auto;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+.rb-stats-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #a5b4fc;
+  margin-bottom: 8px;
+}
+
+.rb-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+  color: #6b7280;
+  transition: all 0.3s ease;
+}
+
+.rb-stat-row.active {
+  color: #e5e7eb;
+}
+
+.rb-stat-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+}
+
+.rb-stat-name {
+  flex: 1;
+}
+
+.rb-stat-value {
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  min-width: 40px;
+  text-align: right;
+}
+
+.rb-stat-row.active .rb-stat-value {
+  color: #34d399;
+}
+
+/* ===== MAIN CONTENT ===== */
+.rb-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+  gap: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
+
+/* Page Header */
+.rb-page-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rb-page-active-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.rb-rename-btn,
+.rb-delete-page-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rb-rename-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+.rb-delete-page-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+
+/* ===== SLOTS ===== */
+.rb-slots-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 0;
+}
+
+.rb-slot {
+  width: 90px;
+  height: 105px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.rb-slot-inner {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid var(--slot-color, rgba(255, 255, 255, 0.1));
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: all 0.3s ease;
+  box-shadow: var(--slot-glow, none);
+  position: relative;
+}
+
+.rb-slot:hover .rb-slot-inner {
+  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.rb-slot.filled .rb-slot-inner {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.rb-slot.selected .rb-slot-inner {
+  animation: rbPulse 1.5s ease-in-out infinite;
+  border-color: #22d3ee !important;
+  --slot-color: #22d3ee;
+}
+
+.rb-slot.empty .rb-slot-inner {
+  border-style: dashed;
+}
+
+.rb-slot-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.rb-slot-tier {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rb-slot-empty-icon {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 300;
+}
+
+.rb-slot-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Slot Tooltip */
+.rb-slot-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: white;
+  white-space: nowrap;
+  text-align: center;
+  z-index: 100;
+  pointer-events: none;
+  line-height: 1.5;
+}
+
+.rb-slot:hover .rb-slot-tooltip {
+  display: block;
+}
+
+/* ===== INVENTORY ===== */
+.rb-inventory {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.rb-inventory-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.rb-inventory-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #a5b4fc;
+}
+
+/* Tier Filter */
+.rb-tier-filter {
+  display: flex;
+  gap: 4px;
+}
+
+.rb-tier-btn {
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rb-tier-btn:hover {
+  color: white;
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.rb-tier-btn.active {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: #6366f1;
+  color: white;
+}
+
+/* Inventory Grid */
+.rb-inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  padding: 12px;
+  overflow-y: auto;
+  max-height: 220px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
+
+/* Rune Item */
+.rb-rune-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.rb-rune-item:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.rb-rune-icon-wrap {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  border: 2px solid;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.rb-rune-item:hover .rb-rune-icon-wrap {
+  transform: scale(1.1);
+}
+
+.rb-rune-icon {
+  font-size: 20px;
+}
+
+.rb-rune-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rb-rune-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rb-rune-desc {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Quantity badge */
+.rb-rune-qty {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid rgba(10, 10, 30, 0.9);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.rb-rune-qty.zero {
+  background: #4b5563;
+  color: #9ca3af;
+}
+
+.rb-rune-icon-wrap {
+  position: relative;
+}
+
+/* Empty rune (qty = 0) */
+.rb-rune-empty {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.rb-rune-empty:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Upgrade button */
+.rb-upgrade-btn {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 2px solid rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(249, 115, 22, 0.15));
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.rb-upgrade-btn:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(249, 115, 22, 0.3));
+  border-color: #f59e0b;
+  transform: scale(1.15);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+}
+
+/* Upgrade toast notification */
+.rb-upgrade-toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9));
+  border: 2px solid rgba(52, 211, 153, 0.5);
+  border-radius: 14px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 20000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: rbSlideDown 0.3s ease-out;
+  backdrop-filter: blur(8px);
+}
+
+@keyframes rbSlideDown {
+  from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+.rb-toast-arrow {
+  color: #fbbf24;
+  font-size: 18px;
+}
+
+.rb-toast-success {
+  font-size: 18px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .rb-modal {
+    width: 96%;
+    max-height: 92vh;
+    border-radius: 14px;
+  }
+
+  .rb-body {
+    flex-direction: column;
+  }
+
+  .rb-sidebar {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px;
+    max-height: 180px;
+  }
+
+  .rb-page-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .rb-page-tab {
+    width: auto;
+    padding: 8px 14px;
+  }
+
+  .rb-stats-summary {
+    display: none;
+  }
+
+  .rb-slots-container {
+    gap: 10px;
+    padding: 16px 0;
+  }
+
+  .rb-slot {
+    width: 70px;
+    height: 85px;
+  }
+
+  .rb-slot-inner {
+    width: 56px;
+    height: 56px;
+  }
+
+  .rb-slot-icon {
+    font-size: 22px;
+  }
+
+  .rb-inventory-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    max-height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rb-header {
+    padding: 12px 16px;
+  }
+
+  .rb-title {
+    font-size: 18px;
+  }
+
+  .rb-inventory-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-slot {
+    width: 60px;
+    height: 78px;
+  }
+
+  .rb-slot-inner {
+    width: 48px;
+    height: 48px;
+  }
+
+  .rb-slot-icon {
+    font-size: 18px;
+  }
+}
