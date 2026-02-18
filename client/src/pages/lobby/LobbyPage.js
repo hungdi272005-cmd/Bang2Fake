@@ -12,6 +12,7 @@ import { openSpinModal } from '../spin/SpinWheel.js';
 import { openShopModal } from '../shop/ShopModal.js';
 import { openRuneBoardModal } from '../rune-board/RuneBoardModal.js';
 import { openTankCollectionModal } from '../tank-collection/TankCollectionModal.js';
+import { openFriendsPopup } from './friends/FriendsPopup.js';
 
 // Store global logout handler
 window.handleLogout = async function() {
@@ -115,6 +116,24 @@ export function initLobbyPage() {
   if (eventBtn) {
     eventBtn.addEventListener('click', () => {
       navigateTo('/events');
+    });
+  }
+
+  // Friends button
+  const friendsBtn = lobbyPage.querySelector('#friends-list-btn');
+  if (friendsBtn) {
+    friendsBtn.addEventListener('click', () => {
+      openFriendsPopup((friendId, friendName) => {
+          // Callback when starting chat from friend list
+          const tabPrivate = document.getElementById('tab-private');
+          if (tabPrivate) {
+              tabPrivate.click();
+              // Logic to select this friend will be in GlobalChat
+              window.dispatchEvent(new CustomEvent('start_private_chat', { 
+                  detail: { id: friendId, name: friendName } 
+              }));
+          }
+      });
     });
   }
 

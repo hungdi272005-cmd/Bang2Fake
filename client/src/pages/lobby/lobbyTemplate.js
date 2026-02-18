@@ -73,13 +73,17 @@ export function getLobbyTemplate(user) {
     <!-- Global Chat Section (Bottom Left) -->
     <div class="global-chat-container">
       <div class="chat-header">
-        <span class="chat-title">💬 Kênh Thế Giới</span>
+        <div class="chat-tabs">
+          <button class="chat-tab active" id="tab-world">Thế Giới</button>
+          <button class="chat-tab" id="tab-private">Riêng Tư</button>
+        </div>
       </div>
       <div class="chat-messages" id="global-chat-messages">
         <div class="chat-message system-message">Chào mừng đến với BangBang!</div>
       </div>
       <div class="chat-input-area">
         <input type="text" id="global-chat-input" placeholder="Nhập tin nhắn..." maxlength="100">
+        <button id="friends-list-btn" title="Bạn bè">👥</button>
         <button id="global-chat-send">Gửi</button>
       </div>
     </div>
