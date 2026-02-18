@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Tank from '../entities/Tank';
 import UIManager from './components/UIManager';
 import InputManager from './components/InputManager';
+import NetworkManager from './components/NetworkManager';
 import GundamConfig from '../entities/tanks/Gundam'; // Import Định nghĩa Tank
 import PhoenixConfig from '../entities/tanks/Phoenix'; // Import Phoenix
 import KakashiConfig from '../entities/tanks/Kakashi'; // Import Kakashi
@@ -11,7 +12,15 @@ import FPSDisplay from '../trangthai/FPSDisplay';
 import NetworkStatus from '../trangthai/NetworkStatus';
 import { applyRuneStatsToConfig } from '../utils/runeStats.js';
 import { fetchRuneData } from '../pages/rune-board/runeApi.js';
-  
+
+// Map tank ID → config
+const TANK_MAP = {
+  'gundam': GundamConfig,
+  'phoenix': PhoenixConfig,
+  'kakashi': KakashiConfig,
+  'deepool': DeepoolConfig
+};
+
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
@@ -46,115 +55,85 @@ export default class GameScene extends Phaser.Scene {
     
     // Nhóm Projectiles & Enemies
     this.projectiles = this.physics.add.group({ runChildUpdate: true }); // Đạn
-    this.enemies = this.physics.add.group(); // Nhóm Enemy (Hình nộm)
+    this.enemies = this.physics.add.group(); // Nhóm Enemy
+
+    // --- XÁC ĐỊNH TANK ĐƯỢC CHỌN ---
+    const myTankId = (window.gameConfig?.selectedTank || 'gundam').toLowerCase();
+    const PlayerTankConfig = TANK_MAP[myTankId] || GundamConfig;
+
+    // Xác định tank đối thủ từ gamePlayers (lưu từ trang chọn tank)
+    let opponentTankId = 'gundam';
+    try {
+      const gamePlayers = JSON.parse(localStorage.getItem('gamePlayers') || '[]');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const myUserId = user.id;
+      const opponent = gamePlayers.find(p => p.userId !== myUserId);
+      if (opponent && opponent.tank) {
+        opponentTankId = opponent.tank.toLowerCase();
+      }
+    } catch (e) {
+      console.warn('⚠️ Không đọc được thông tin đối thủ, dùng default');
+    }
+    const OpponentTankConfig = TANK_MAP[opponentTankId] || GundamConfig;
+
+    console.log(`🎮 Player tank: ${PlayerTankConfig.name} | Opponent tank: ${OpponentTankConfig.name}`);
 
     // --- SPAWN TANK (PLAYER) ---
     const spawnPoints = this.map.getSpawnPoints();
     const spawnPos = spawnPoints.length > 0 ? spawnPoints[0] : { x: 100, y: 100 };
 
-    // Tạo tank với base stats trước
-    const pConfig = { ...DeepoolConfig, team: 1 };
+    const pConfig = { ...PlayerTankConfig, team: 1 };
     this.player = new Tank(this, spawnPos.x, spawnPos.y, pConfig);
 
     // Load rune data bất đồng bộ → áp dụng sau khi load xong
     this.loadAndApplyRunes(pConfig);
 
-    // --- SPAWN DUMMY ENEMY (Gundam) ---
-    // Spawn cách player một đoạn
-    const dummyPos = { x: spawnPos.x + 200, y: spawnPos.y };
-    // Kiểm tra nếu map rộng thì spawn xa hơn chút
-    if (spawnPoints.length > 1) {
-        // dummyPos = spawnPoints[1]; // Nếu muốn dùng điểm spawn 2
-    }
-    
-    // Enemy: Team 2
-    const eConfig = { ...GundamConfig, team: 2 };
-    this.dummy = new Tank(this, dummyPos.x, dummyPos.y, eConfig);
-    // Add container của dummy vào group enemies để xử lý va chạm chung
-    this.enemies.add(this.dummy.container);
+    // --- SPAWN ĐỐI THỦ ---
+    const dummyPos = spawnPoints.length > 1 
+      ? spawnPoints[1] 
+      : { x: spawnPos.x + 300, y: spawnPos.y };
 
-    // --- SPAWN ALLY (Phoenix - Team 1) ---
-    // Spawn một đồng minh để test đi xuyên
-    const allyPos = { x: spawnPos.x - 100, y: spawnPos.y };
-    const allyConfig = { ...PhoenixConfig, team: 1 };
-    this.ally = new Tank(this, allyPos.x, allyPos.y, allyConfig);
-    
-    // Ally Collision
-    this.physics.add.collider(this.ally.container, this.map.walls);
-    this.physics.add.collider(this.ally.container, this.map.softWalls);
-    
-    // Ally vs Enemy (Chặn nhau)
-    this.physics.add.collider(this.ally.container, this.enemies, null, (ally, enemy) => {
-        return true; // Khác team -> Chặn
-    });
+    const eConfig = { ...OpponentTankConfig, team: 2 };
+    this.dummy = new Tank(this, dummyPos.x, dummyPos.y, eConfig);
+    this.enemies.add(this.dummy.container);
 
     // --- XỬ LÝ VA CHẠM (COLLISION) ---
     // 1. Tank vs Map
     this.physics.add.collider(this.player.container, this.map.walls);
     this.physics.add.collider(this.player.container, this.map.softWalls);
-    
-    // Dummy vs Map
     this.physics.add.collider(this.dummy.container, this.map.walls);
     this.physics.add.collider(this.dummy.container, this.map.softWalls);
     
-    // 2. Tank vs Tank (Chặn nhau nếu khác Team)
-    // Player vs Dummy Is Handled inside generic logic if we grouped them, but here we do explicit pairs for now
-    
-    const checkTeamCollision = (obj1, obj2) => {
-        // Lấy Tank instance từ container (giả sử ta gán manually hoặc tìm cách nào đó)
-        // Hiện tại ta so sánh trực tiếp this.player, this.dummy, this.ally
-        let t1 = null; 
-        if (obj1 === this.player.container) t1 = this.player;
-        else if (obj1 === this.dummy.container) t1 = this.dummy;
-        else if (obj1 === this.ally.container) t1 = this.ally;
+    // 2. Tank vs Tank (Chặn nhau - khác team)
+    this.physics.add.collider(this.player.container, this.dummy.container);
 
-        let t2 = null;
-        if (obj2 === this.player.container) t2 = this.player;
-        else if (obj2 === this.dummy.container) t2 = this.dummy;
-        else if (obj2 === this.ally.container) t2 = this.ally;
-
-        if (t1 && t2) {
-            return t1.team !== t2.team;
-        }
-        return true;
-    };
-
-    this.physics.add.collider(this.player.container, this.dummy.container, null, checkTeamCollision);
-    this.physics.add.collider(this.player.container, this.ally.container, null, checkTeamCollision);
-
-    // 2. Tank vs Item (Overlap -> Ăn)
+    // 3. Tank vs Item (Overlap -> Ăn)
     this.physics.add.overlap(this.player.container, this.map.items, (player, item) => {
-        item.destroy(); // Ăn item -> mất item
+        item.destroy();
         console.log("Collected Item!");
-        // TODO: Thêm logic buff (Buff máu, speed...)
     });
 
-    // 3. Đạn vs Tường cứng -> Đạn nổ
+    // 4. Đạn vs Tường cứng -> Đạn nổ
     this.physics.add.collider(this.projectiles, this.map.walls, (projectile, wall) => {
         projectile.destroy();
-        // TODO: Thêm hiệu ứng nổ
     });
 
-    // 4. Đạn vs Tường mềm -> Cả 2 cùng mất (Hoặc tường mất máu)
+    // 5. Đạn vs Tường mềm -> Cả 2 cùng mất
     this.physics.add.collider(this.projectiles, this.map.softWalls, (projectile, wall) => {
         projectile.destroy();
         this.map.destroySoftWall(wall);
     });
 
-    // 5. Đạn vs Enemy (Phoenix Dummy)
+    // 6. Đạn vs Enemy
     this.physics.add.overlap(this.projectiles, this.enemies, (projectile, enemyContainer) => {
-        projectile.destroy(); // Hủy đạn
+        projectile.destroy();
         
-        // Tìm instance Tank từ container (hoặc xử lý trực tiếp nếu logic đơn giản)
-        // Ở đây mình biết enemyContainer là container của this.dummy
         if (this.dummy && this.dummy.container === enemyContainer) {
-            // Lấy damage từ viên đạn (đã được TankWeapon tính toán)
             const damage = projectile.damage || 50; 
             this.dummy.takeDamage(damage); 
-            console.log(`Enemy Hit! Damage: ${damage}. Health: ${this.dummy.health.currentHealth}/${this.dummy.health.maxHealth}`);
+            // onEffectCallback trên dummy sẽ tự broadcast damage qua network
             
-            // Hiệu ứng nháy đỏ khi trúng đạn
-            if (this.dummy.body.setTint) {
+            if (this.dummy.body && this.dummy.body.setTint) {
                 this.dummy.body.setTint(0xff0000);
                 this.time.delayedCall(100, () => {
                    if(this.dummy && this.dummy.body) this.dummy.body.clearTint();
@@ -163,7 +142,7 @@ export default class GameScene extends Phaser.Scene {
         }
     });
 
-    // Camera theo dõi tank player (tức thì - không delay)
+    // Camera theo dõi tank player
     this.cameras.main.startFollow(this.player.container);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
@@ -172,6 +151,63 @@ export default class GameScene extends Phaser.Scene {
 
     // Khởi tạo Input Manager
     this.inputManager = new InputManager(this);
+
+    // Khởi tạo Network Manager (multiplayer sync)
+    const gameSessionId = localStorage.getItem('gameSessionId') || '';
+    this.networkManager = new NetworkManager(this, gameSessionId);
+
+    // Set vị trí ban đầu của opponent cho NetworkManager
+    if (this.dummy) {
+      this.networkManager.opponentData.x = this.dummy.container.x;
+      this.networkManager.opponentData.y = this.dummy.container.y;
+    }
+
+    // --- DUMMY: Khi bị effect → broadcast qua network cho đối thủ ---
+    if (this.dummy) {
+      this.dummy.onEffectCallback = (type, params) => {
+        this.networkManager.sendEffect(type, params);
+      };
+    }
+
+    // Callback khi đối thủ bắn → spawn đạn visual
+    this.networkManager.onOpponentShoot((data) => {
+      if (this.dummy && this.dummy.weapon) {
+        this.dummy.shoot();
+      }
+    });
+
+    // --- PLAYER: Nhận effect từ đối thủ → áp dụng lên player ---
+    this.networkManager.onOpponentEffect((data) => {
+      if (!this.player) return;
+      const { type, params } = data;
+      
+      switch (type) {
+        case 'damage':
+          this.player.takeDamage(params.amount, true); // fromNetwork = true
+          console.log(`🔴 Bị đối thủ gây ${params.amount} damage! HP: ${this.player.health.currentHealth}`);
+          break;
+        case 'stun':
+          this.player.applyStun(params.duration, true);
+          console.log(`⚡ Bị choáng ${params.duration}ms!`);
+          break;
+        case 'slow':
+          this.player.applySlow(params.amount, params.duration, true);
+          console.log(`🐌 Bị làm chậm ${params.amount} trong ${params.duration}ms!`);
+          break;
+        case 'silence':
+          this.player.applySilence(params.duration, true);
+          console.log(`🔇 Bị câm lặng ${params.duration}ms!`);
+          break;
+      }
+    });
+
+    // Wire InputManager callbacks → NetworkManager
+    this.inputManager.onShootCallback = (player) => {
+      this.networkManager.sendShoot(player);
+    };
+    this.inputManager.onSkillCallback = (skillKey, player) => {
+      this.networkManager.sendSkill(skillKey, player);
+    };
 
     // Khởi tạo UI Manager
     this.uiManager = new UIManager(this);
@@ -221,8 +257,23 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    // Xử lý input
-    this.inputManager.handleInput(this.player, this.dummy, this.input.activePointer);
+    // Xử lý input (chỉ player, không điều khiển dummy nữa)
+    this.inputManager.handleInput(this.player, null, this.input.activePointer);
+
+    // --- MULTIPLAYER SYNC ---
+    if (this.networkManager) {
+      // Gửi vị trí player lên server (throttled 20Hz)
+      this.networkManager.sendPlayerUpdate(this.player);
+      
+      // Nhận + lerp vị trí đối thủ
+      this.networkManager.updateOpponent(this.dummy);
+    }
+
+    // Cập nhật weapon/abilities cho dummy (để visual đúng vị trí)
+    if (this.dummy) {
+      this.dummy.weapon.update();
+      this.dummy.abilities.update();
+    }
 
     // Cập nhật UI
     this.uiManager.updateAbilityUI(this.player);
@@ -230,9 +281,7 @@ export default class GameScene extends Phaser.Scene {
     // Cập nhật Trạng thái
     if (this.fpsDisplay) this.fpsDisplay.update();
     if (this.networkStatus) {
-         // Giả lập ping (vì chưa có server thực tế)
-         // Ping dao động từ 15ms đến 45ms
-         if (time % 1000 < 20) { // Cập nhật mỗi giây
+         if (time % 1000 < 20) {
             const fakePing = Math.floor(Math.random() * 30) + 15;
             this.networkStatus.updatePing(fakePing);
          }

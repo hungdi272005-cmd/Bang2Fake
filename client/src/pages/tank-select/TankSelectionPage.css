@@ -1,299 +1,504 @@
-/* Tank Selection Page Styles */
+/* ===== Tank Selection Page - Battle Theme ===== */
 
 .tank-select-container {
-  min-height: 100vh;
+  width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  gap: 30px;
+  background: linear-gradient(135deg, #0a1628 0%, #0d2137 30%, #0a1628 100%);
+  overflow: hidden;
+  position: relative;
 }
 
-/* Header */
-.select-header {
+/* ===== HEADER ===== */
+.ts-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  padding: 8px 20px;
+  background: linear-gradient(180deg, rgba(0, 180, 255, 0.3) 0%, rgba(0, 100, 180, 0.1) 100%);
+  border-bottom: 2px solid rgba(0, 200, 255, 0.4);
+  z-index: 10;
 }
 
-.select-title {
+.ts-header-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: 48px;
-  font-weight: 800;
-  color: white;
-  text-align: center;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
 }
 
-.countdown-display {
+.ts-header-title span {
+  color: #00e5ff;
+}
+
+.ts-countdown {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  border: 2px solid;
+  font-family: 'Orbitron', sans-serif;
 }
 
-.countdown-display.normal {
-  border-color: #8b5cf6;
-}
-
-.countdown-display.ranked {
-  border-color: #f43f5e;
-}
-
-.countdown-label {
-  font-size: 14px;
+.ts-countdown-label {
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
 }
 
-.countdown-value {
-  font-family: 'Orbitron', sans-serif;
+.ts-countdown-value {
   font-size: 28px;
-  font-weight: 700;
-  color: white;
+  font-weight: 900;
+  color: #00e5ff;
+  text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
   min-width: 40px;
   text-align: center;
 }
 
-.countdown-value.warning {
-  color: #fbbf24;
-  animation: pulse 0.5s ease-in-out infinite;
+.ts-countdown-value.warning {
+  color: #ff9800;
+  text-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
+  animation: countdownPulse 0.5s ease-in-out infinite;
 }
 
-.countdown-value.critical {
-  color: #ef4444;
-  animation: pulse 0.3s ease-in-out infinite;
+.ts-countdown-value.critical {
+  color: #f44336;
+  text-shadow: 0 0 15px rgba(244, 67, 54, 0.6);
+  animation: countdownPulse 0.3s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes countdownPulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  50% { transform: scale(1.15); }
 }
 
-.countdown-unit {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* Tank Cards Grid */
-.tank-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 900px;
-}
-
-.tank-card {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 24px;
+/* ===== MAIN LAYOUT - 3 columns ===== */
+.ts-main {
+  flex: 1;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
+  gap: 0;
   overflow: hidden;
 }
 
-.tank-card:hover {
-  transform: translateY(-8px);
-  border-color: #8b5cf6;
-  box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+/* ===== LEFT PANEL (Ta) ===== */
+.ts-panel-left {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(90deg, rgba(0, 100, 200, 0.15) 0%, transparent 100%);
+  border-right: 1px solid rgba(0, 200, 255, 0.15);
 }
 
-.tank-card.selected {
-  border-color: #10b981;
-  box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+.ts-panel-title {
+  padding: 12px 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-.tank-card.selected::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent);
-  pointer-events: none;
+.ts-panel-left .ts-panel-title {
+  color: #4fc3f7;
+  background: linear-gradient(180deg, rgba(0, 150, 255, 0.2) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(0, 200, 255, 0.2);
 }
 
-.tank-icon {
-  width: 90px;
-  height: 90px;
+/* ===== RIGHT PANEL (Địch) ===== */
+.ts-panel-right {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(270deg, rgba(200, 50, 50, 0.15) 0%, transparent 100%);
+  border-left: 1px solid rgba(255, 100, 100, 0.15);
+}
+
+.ts-panel-right .ts-panel-title {
+  color: #ef5350;
+  background: linear-gradient(180deg, rgba(200, 50, 50, 0.2) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(255, 100, 100, 0.2);
+}
+
+/* ===== PLAYER SLOTS ===== */
+.ts-player-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 4px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.ts-player-slot.ready {
+  border-color: rgba(76, 175, 80, 0.5);
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.ts-player-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease;
-}
-
-.tank-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
-}
-
-.tank-card:hover .tank-icon {
-  transform: scale(1.1);
-}
-
-.tank-name {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-}
-
-/* Tank Stats */
-.tank-stats {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.stat-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  width: 60px;
-}
-
-.stat-bar {
-  flex: 1;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.stat-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.5s ease;
-}
-
-.stat-fill.hp {
-  background: linear-gradient(90deg, #ef4444, #f87171);
-}
-
-.stat-fill.speed {
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
-}
-
-.stat-value {
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-  width: 40px;
-  text-align: right;
-}
-
-/* Skills */
-.tank-skills {
-  display: flex;
-  gap: 8px;
-}
-
-.skill-badge {
-  padding: 6px 12px;
-  background: rgba(139, 92, 246, 0.3);
-  border: 1px solid #8b5cf6;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #a78bfa;
-}
-
-/* Select Indicator */
-.select-indicator {
-  position: absolute;
-  bottom: -40px;
-  left: 0;
-  right: 0;
-  padding: 8px;
-  background: #10b981;
-  color: white;
-  font-weight: 700;
-  text-align: center;
-  transition: bottom 0.3s ease;
-}
-
-.tank-card.selected .select-indicator {
-  bottom: 0;
-}
-
-/* Confirm Button */
-.confirm-btn {
-  padding: 18px 48px;
-  background: linear-gradient(135deg, #6b7280, #4b5563);
-  border: none;
-  border-radius: 14px;
   font-size: 20px;
-  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ts-panel-left .ts-player-avatar {
+  background: linear-gradient(135deg, #1565c0, #42a5f5);
+}
+
+.ts-panel-right .ts-player-avatar {
+  background: linear-gradient(135deg, #c62828, #ef5350);
+}
+
+.ts-player-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ts-player-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ts-player-tank {
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.5);
-  cursor: not-allowed;
-  transition: all 0.3s ease;
+  margin-top: 2px;
 }
 
-.confirm-btn.active {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+.ts-player-tank.selected {
+  color: #4fc3f7;
 }
 
-.confirm-btn.active:hover {
-  transform: scale(1.05) translateY(-3px);
-  box-shadow: 0 12px 40px rgba(16, 185, 129, 0.6);
+.ts-player-ready-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
 }
 
-/* Tips */
-.select-tips {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 16px 24px;
-  border-radius: 12px;
+.ts-player-ready-badge.ready {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.ts-player-ready-badge.waiting {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.select-tips p {
-  margin: 0;
-  font-size: 14px;
+/* ===== Tank Preview (bên panel) ===== */
+.ts-tank-preview {
+  margin: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.ts-tank-preview img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(0, 200, 255, 0.4));
+}
+
+.ts-tank-preview .tank-unknown {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 auto;
+}
+
+/* ===== CENTER - Tank Grid ===== */
+.ts-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  overflow: hidden;
+}
+
+/* Category tabs */
+.ts-category-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.ts-category-tab {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+}
+
+.ts-category-tab:hover {
+  background: rgba(0, 200, 255, 0.1);
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Responsive */
+.ts-category-tab.active {
+  background: linear-gradient(180deg, rgba(0, 200, 255, 0.25) 0%, rgba(0, 100, 200, 0.15) 100%);
+  color: #00e5ff;
+  border-color: rgba(0, 200, 255, 0.3);
+}
+
+/* Tank grid */
+.ts-tank-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  overflow-y: auto;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 200, 255, 0.1);
+}
+
+.ts-tank-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ts-tank-grid::-webkit-scrollbar-thumb {
+  background: rgba(0, 200, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* Tank Card */
+.ts-tank-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.ts-tank-card:hover {
+  background: linear-gradient(180deg, rgba(0, 200, 255, 0.15) 0%, rgba(0, 100, 200, 0.08) 100%);
+  border-color: rgba(0, 200, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 200, 255, 0.15);
+}
+
+.ts-tank-card.selected {
+  background: linear-gradient(180deg, rgba(0, 200, 255, 0.25) 0%, rgba(0, 100, 200, 0.15) 100%);
+  border-color: #00e5ff;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3), inset 0 0 15px rgba(0, 229, 255, 0.1);
+}
+
+.ts-tank-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 14px;
+  color: #00e5ff;
+  font-weight: 900;
+}
+
+.ts-tank-card-img {
+  width: 70px;
+  height: 55px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+  transition: transform 0.2s ease;
+}
+
+.ts-tank-card:hover .ts-tank-card-img {
+  transform: scale(1.08);
+}
+
+.ts-tank-card-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 6px;
+  text-align: center;
+}
+
+.ts-tank-card.selected .ts-tank-card-name {
+  color: #00e5ff;
+}
+
+.ts-tank-card-role {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ===== FOOTER ===== */
+.ts-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+  border-top: 1px solid rgba(0, 200, 255, 0.15);
+  gap: 16px;
+}
+
+.ts-ready-btn {
+  padding: 12px 40px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  cursor: not-allowed;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.ts-ready-btn.active {
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #00897b 0%, #00bcd4 100%);
+  border-color: #00e5ff;
+  box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3);
+}
+
+.ts-ready-btn.active:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(0, 229, 255, 0.5);
+}
+
+.ts-ready-btn.confirmed {
+  cursor: default;
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.15);
+  border-color: #4caf50;
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+}
+
+.ts-cancel-btn {
+  padding: 10px 20px;
+  font-size: 13px;
+  color: #ef5350;
+  background: rgba(239, 83, 80, 0.1);
+  border: 1px solid rgba(239, 83, 80, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ts-cancel-btn:hover {
+  background: rgba(239, 83, 80, 0.2);
+}
+
+/* ===== SELECTED TANK DETAILS ===== */
+.ts-tank-details {
+  margin-top: auto;
+  padding: 8px;
+}
+
+.ts-detail-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ts-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.ts-stat-label {
+  color: rgba(255, 255, 255, 0.5);
+  width: 35px;
+}
+
+.ts-stat-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ts-stat-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.ts-stat-fill.hp {
+  background: linear-gradient(90deg, #4caf50, #81c784);
+}
+
+.ts-stat-fill.spd {
+  background: linear-gradient(90deg, #ff9800, #ffb74d);
+}
+
+.ts-stat-fill.atk {
+  background: linear-gradient(90deg, #f44336, #ef5350);
+}
+
+/* ===== VS Divider ===== */
+.ts-vs-badge {
+  display: none;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 900px) {
-  .tank-cards-grid {
-    grid-template-columns: 1fr;
-    max-width: 350px;
+  .ts-panel-left, .ts-panel-right {
+    width: 150px;
   }
   
-  .select-title {
-    font-size: 32px;
+  .ts-tank-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (min-width: 600px) and (max-width: 900px) {
-  .tank-cards-grid {
+@media (max-width: 650px) {
+  .ts-panel-left, .ts-panel-right {
+    width: 120px;
+  }
+  
+  .ts-tank-grid {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 600px;
+  }
+  
+  .ts-tank-card-img {
+    width: 50px;
+    height: 40px;
   }
 }

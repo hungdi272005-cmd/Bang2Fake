@@ -97,14 +97,14 @@ io.on('connection', (socket) => {
   /**
    * Event: findMatch - Tìm trận đấu
    */
-  socket.on('findMatch', async (data) => {
+  socket.on('findMatch', async () => {
     console.log(`🔍 ${socket.user.username} đang tìm trận...`);
 
     const playerData = {
       userId: socket.user._id.toString(),
       username: socket.user.username,
-      socketId: socket.id,
-      tank: data.tank || socket.user.selectedTank
+      displayName: socket.user.displayName || socket.user.username,
+      socketId: socket.id
     };
 
     // Thêm vào matchmaking queue
@@ -114,22 +114,28 @@ io.on('connection', (socket) => {
       // Đã tìm được trận, notify cả 2 players
       const [player1, player2] = match.players;
 
+      // Cả 2 join session room
+      const p1Socket = io.sockets.sockets.get(player1.socketId);
+      const p2Socket = io.sockets.sockets.get(player2.socketId);
+      if (p1Socket) p1Socket.join(`session:${match.sessionId}`);
+      if (p2Socket) p2Socket.join(`session:${match.sessionId}`);
+
       io.to(player1.socketId).emit('matchFound', {
         sessionId: match.sessionId,
         opponent: {
+          userId: player2.userId,
           username: player2.username,
-          tank: player2.tank
-        },
-        yourTank: player1.tank
+          displayName: player2.displayName || player2.username
+        }
       });
 
       io.to(player2.socketId).emit('matchFound', {
         sessionId: match.sessionId,
         opponent: {
+          userId: player1.userId,
           username: player1.username,
-          tank: player1.tank
-        },
-        yourTank: player2.tank
+          displayName: player1.displayName || player1.username
+        }
       });
 
       console.log(`✅ Match found! Session: ${match.sessionId}`);
@@ -156,14 +162,107 @@ io.on('connection', (socket) => {
   });
 
   /**
-   * Event: gameInput - Xử lý input trong game
-   * TODO: Implement game logic
+   * Event: selectTank - Chọn tank trong phòng chọn tank
    */
-  socket.on('gameInput', (data) => {
-    // Broadcast input tới session room
-    socket.to(data.sessionId).emit('opponentInput', {
-      playerId: socket.user._id.toString(),
-      input: data.input
+  socket.on('selectTank', (data) => {
+    const { sessionId, tankId } = data;
+    const userId = socket.user._id.toString();
+
+    const session = matchmakingQueue.selectTank(sessionId, userId, tankId);
+    if (session) {
+      // Broadcast cho đối thủ biết mình chọn tank gì
+      socket.to(`session:${sessionId}`).emit('opponentSelectTank', {
+        tankId
+      });
+      console.log(`🎯 ${socket.user.username} chọn tank: ${tankId}`);
+    }
+  });
+
+  /**
+   * Event: confirmReady - Xác nhận sẵn sàng
+   */
+  socket.on('confirmReady', (data) => {
+    const { sessionId } = data;
+    const userId = socket.user._id.toString();
+
+    const result = matchmakingQueue.confirmReady(sessionId, userId);
+
+    // Broadcast cho đối thủ biết mình đã ready
+    socket.to(`session:${sessionId}`).emit('opponentReady', {
+      userId
+    });
+
+    if (result.allReady) {
+      // Cả 2 đều ready → bắt đầu game!
+      const session = result.session;
+      const players = Object.values(session.players);
+
+      console.log(`🚀 All ready! Starting game for session: ${sessionId}`);
+
+      // Emit allReady cho cả 2 player
+      io.to(`session:${sessionId}`).emit('allReady', {
+        sessionId,
+        players: players.map(p => ({
+          userId: p.userId,
+          username: p.username,
+          displayName: p.displayName,
+          tank: p.tank
+        }))
+      });
+
+      // Cleanup session từ matchmaking queue (game đã bắt đầu)
+      matchmakingQueue.removeSession(sessionId);
+    }
+  });
+
+  /**
+   * Event: playerUpdate - Đồng bộ vị trí/rotation (~20 tick/s)
+   * Relay trực tiếp cho đối thủ trong session room
+   */
+  socket.on('playerUpdate', (data) => {
+    socket.to(`session:${data.sessionId}`).emit('opponentUpdate', {
+      x: data.x,
+      y: data.y,
+      bodyAngle: data.bodyAngle,
+      turretRotation: data.turretRotation,
+      health: data.health,
+      maxHealth: data.maxHealth
+    });
+  });
+
+  /**
+   * Event: playerShoot - Thông báo bắn đạn
+   */
+  socket.on('playerShoot', (data) => {
+    socket.to(`session:${data.sessionId}`).emit('opponentShoot', {
+      x: data.x,
+      y: data.y,
+      angle: data.angle,
+      damage: data.damage,
+      bulletSpeed: data.bulletSpeed
+    });
+  });
+
+  /**
+   * Event: playerSkill - Thông báo dùng skill
+   */
+  socket.on('playerSkill', (data) => {
+    socket.to(`session:${data.sessionId}`).emit('opponentSkill', {
+      skillKey: data.skillKey,
+      x: data.x,
+      y: data.y,
+      angle: data.angle
+    });
+  });
+
+  /**
+   * Event: playerEffect - Thông báo gây effect (damage, stun, slow, silence)
+   * Relay toàn bộ data cho đối thủ áp dụng
+   */
+  socket.on('playerEffect', (data) => {
+    socket.to(`session:${data.sessionId}`).emit('opponentEffect', {
+      type: data.type,
+      params: data.params
     });
   });
 

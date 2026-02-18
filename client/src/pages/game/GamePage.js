@@ -37,12 +37,19 @@ export function startGame() {
   const selectedTank = getSelectedTank();
   const gameMode = getGameMode();
   
+  // Lấy thông tin players từ trang chọn tank
+  let gamePlayers = [];
+  try {
+    gamePlayers = JSON.parse(localStorage.getItem('gamePlayers') || '[]');
+  } catch (e) {}
+  
   console.log('🎮 Starting game with tank:', selectedTank, 'mode:', gameMode);
   
   // Lưu thông tin để GameScene sử dụng
   window.gameConfig = {
     selectedTank,
-    gameMode
+    gameMode,
+    gamePlayers
   };
   
   // Phaser game config

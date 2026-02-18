@@ -102,10 +102,8 @@ export default class BattleMap {
     }
 
     resize(width, height) {
-        if (this.grid) {
-            this.grid.setPosition(width / 2, height / 2);
-            this.grid.setSize(width, height);
-        }
+        // Grid luôn ở giữa map, không theo màn hình
+        // (Camera sẽ tự scroll theo player)
     }
 
     destroySoftWall(wall) {

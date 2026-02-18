@@ -103,6 +103,44 @@ export function logout() {
 }
 
 /**
+ * Xử lý khi bị đá ra do đăng nhập ở nơi khác
+ */
+export function handleSessionExpired() {
+  alert('⚠️ Tài khoản của bạn đã đăng nhập ở nơi khác. Bạn sẽ được chuyển về trang đăng nhập.');
+  logout();
+}
+
+/**
+ * Gọi API có xác thực - tự động kiểm tra SESSION_EXPIRED
+ */
+export async function authFetch(url, options = {}) {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Chưa đăng nhập');
+  }
+
+  const headers = {
+    ...options.headers,
+    'Authorization': `Bearer ${token}`
+  };
+
+  const response = await fetch(url, { ...options, headers });
+  const data = await response.json();
+
+  // Kiểm tra bị đá ra do đăng nhập nơi khác
+  if (response.status === 401 && data.code === 'SESSION_EXPIRED') {
+    handleSessionExpired();
+    throw new Error(data.message);
+  }
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Lỗi khi gọi API');
+  }
+
+  return data;
+}
+
+/**
  * Lấy JWT token
  */
 export function getToken() {
@@ -129,30 +167,14 @@ export function isAuthenticated() {
  */
 export async function getCurrentUser() {
   try {
-    const token = getToken();
-    if (!token) {
-      throw new Error('Chưa đăng nhập');
-    }
-
-    const response = await fetch(`${API_URL}/auth/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Không thể lấy thông tin user');
-    }
+    const data = await authFetch(`${API_URL}/auth/me`);
 
     // Cập nhật localStorage
     localStorage.setItem('user', JSON.stringify(data.user));
 
     return data.user;
   } catch (error) {
-    // Token hết hạn hoặc invalid
-    logout();
+    // Token hết hạn, invalid, hoặc bị đá ra
     throw error;
   }
 }

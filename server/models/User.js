@@ -133,6 +133,11 @@ const userSchema = new mongoose.Schema({
     of: String,  // tankId → pageId
     default: () => new Map()
   },
+  // Session token: đảm bảo chỉ đăng nhập được 1 nơi
+  sessionToken: {
+    type: String,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

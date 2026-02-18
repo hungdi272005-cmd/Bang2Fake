@@ -3,6 +3,8 @@ import Phaser from 'phaser';
 export default class InputManager {
   constructor(scene) {
     this.scene = scene;
+    this.onShootCallback = null;
+    this.onSkillCallback = null;
     this.setupInput();
   }
 
@@ -26,18 +28,23 @@ export default class InputManager {
   }
 
   handleInput(player, dummy, pointer) {
-    // Cập nhật di chuyển
+    // Cập nhật di chuyển player
     if (player) {
          player.update(null, this.wasd);
     }
     
+    // Dummy giờ điều khiển bởi network, không dùng keyboard
     if (dummy) {
-         dummy.update(this.cursors, null);
+         // Không update movement, chỉ giữ weapon/abilities update
     }
 
     // Xử lý bắn (Giữ chuột trái để bắn liên tục)
     if (player && pointer.isDown) {
       player.shoot();
+      // Gửi event bắn qua network
+      if (this.onShootCallback) {
+        this.onShootCallback(player);
+      }
     }
 
     // Cập nhật hướng ngắm theo chuột liên tục
@@ -49,15 +56,19 @@ export default class InputManager {
     if (player) {
         if (Phaser.Input.Keyboard.JustDown(this.abilityKeys.q)) {
           player.useAbilityQ(pointer);
+          if (this.onSkillCallback) this.onSkillCallback('q', player);
         }
         if (Phaser.Input.Keyboard.JustDown(this.abilityKeys.e)) {
           player.useAbilityE(pointer);
+          if (this.onSkillCallback) this.onSkillCallback('e', player);
         }
         if (Phaser.Input.Keyboard.JustDown(this.abilityKeys.r)) {
           player.useAbilityR(pointer);
+          if (this.onSkillCallback) this.onSkillCallback('r', player);
         }
         if (Phaser.Input.Keyboard.JustDown(this.abilityKeys.space)) {
           player.useAbilitySpace(pointer);
+          if (this.onSkillCallback) this.onSkillCallback('space', player);
         }
     }
   }
