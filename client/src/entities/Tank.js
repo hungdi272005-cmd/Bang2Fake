@@ -10,6 +10,10 @@ export default class Tank {
     this.scene = scene;
     this.team = config.team || 0; // Thêm team (0: Neutral, 1: Team 1, 2: Team 2...)
     
+    // Network callback: gọi khi tank này bị tác động (damage/effect)
+    // GameScene sẽ set callback này cho dummy tank để broadcast qua mạng
+    this.onEffectCallback = null;
+    
     // Chỉ số mặc định nếu không được cung cấp
     const stats = config.stats || { speed: 200, health: 1000 }; // Thêm máu mặc định
   
@@ -107,7 +111,7 @@ export default class Tank {
   }
 
   // Xử lý sát thương
-  takeDamage(amount) {
+  takeDamage(amount, fromNetwork = false) {
     // Áp dụng giảm sát thương từ ngọc Phòng Thủ
     const reducedAmount = Math.round(amount * (1 - (this.defense || 0) / 100));
     const remaining = this.health.takeDamage(reducedAmount);
@@ -115,10 +119,13 @@ export default class Tank {
     // Hiển thị số dame
     this.showDamagePopup(reducedAmount);
 
+    // Broadcast qua network (chỉ khi không phải nhận từ network để tránh loop)
+    if (!fromNetwork && this.onEffectCallback) {
+      this.onEffectCallback('damage', { amount: reducedAmount, health: this.health.currentHealth });
+    }
+
     if (remaining <= 0) {
-      // Logic chết (tương lai)
       console.log("Tank Died");
-      // this.container.destroy(); // Hủy đơn giản hoặc sự kiện cho hiện tại
     }
   }
 
@@ -147,13 +154,12 @@ export default class Tank {
   }
 
   // Áp dụng hiệu ứng Câm lặng
-  applySilence(duration) {
-    if (this.container.isSilenced) return; // Đang bị silence thì thôi (hoặc reset time)
+  applySilence(duration, fromNetwork = false) {
+    if (this.container.isSilenced) return;
 
     this.container.isSilenced = true;
     console.log(`${this.container} is Silenced!`);
     
-    // Hiệu ứng visual (VD: Icon câm lặng trên đầu)
     const silenceText = this.scene.add.text(0, -50, 'SILENCED!', {
         fontSize: '14px',
         color: '#ff00ff',
@@ -167,30 +173,32 @@ export default class Tank {
             silenceText.destroy();
         }
     });
+
+    if (!fromNetwork && this.onEffectCallback) {
+      this.onEffectCallback('silence', { duration });
+    }
   }
 
   // Áp dụng làm chậm (Slow)
-  applySlow(amount, duration) {
-      // Chỉ số speed tối thiểu
+  applySlow(amount, duration, fromNetwork = false) {
       const minSpeed = 50;
-      
-      // Tính tốc độ mới
       let newSpeed = this.movement.originalSpeed - amount;
       if (newSpeed < minSpeed) newSpeed = minSpeed;
 
-      // Áp dụng tốc độ
       this.movement.setSpeed(newSpeed);
 
-      // Reset timer nếu đã có (làm mới thời gian hiệu ứng)
       if (this.slowTimer) {
           this.slowTimer.remove();
       }
 
-      // Hẹn giờ trả lại tốc độ cũ
       this.slowTimer = this.scene.time.delayedCall(duration, () => {
           this.movement.resetSpeed();
           this.slowTimer = null;
       });
+
+      if (!fromNetwork && this.onEffectCallback) {
+        this.onEffectCallback('slow', { amount, duration });
+      }
   }
 
   // Áp dụng tăng tốc (Speed Boost)
@@ -209,19 +217,16 @@ export default class Tank {
   }
 
   // Áp dụng Choáng (Stun)
-  applyStun(duration) {
-      // Luôn dừng vận tốc ngay lập tức khi trúng hiệu ứng choáng 
-      // (kể cả khi đã bị choáng trước đó để tránh bị trôi/đẩy)
+  applyStun(duration, fromNetwork = false) {
       if (this.container.body) {
           this.container.body.setVelocity(0, 0);
       }
 
-      if (this.container.isStunned) return; // Nếu đã hiện text "STUNNED" rồi thì thôi
+      if (this.container.isStunned) return;
 
       this.container.isStunned = true;
       console.log(`${this.container} is Stunned!`);
 
-      // Hiệu ứng Visual (Vòng xoáy trên đầu?)
       const stunText = this.scene.add.text(0, -60, 'STUNNED!', {
           fontSize: '16px',
           color: '#ffff00',
@@ -237,6 +242,10 @@ export default class Tank {
               if (stunText.active) stunText.destroy();
           }
       });
+
+      if (!fromNetwork && this.onEffectCallback) {
+        this.onEffectCallback('stun', { duration });
+      }
   }
 
   update(cursors, wasd) {

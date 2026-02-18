@@ -1,14 +1,16 @@
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 const User = require('../models/User');
 
 /**
- * Tạo JWT token
+ * Tạo JWT token (bao gồm sessionToken để kiểm tra đăng nhập 1 nơi)
  * @param {string} id - User ID
+ * @param {string} sessionToken - Session token duy nhất
  * @returns {string} JWT token
  */
-const generateToken = (id) => {
+const generateToken = (id, sessionToken) => {
   return jwt.sign(
-    { id },
+    { id, sessionToken },
     process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
     {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d'
@@ -53,15 +55,19 @@ const register = async (req, res) => {
       });
     }
 
+    // Tạo session token (đảm bảo chỉ đăng nhập 1 nơi)
+    const sessionToken = uuidv4();
+
     // Tạo user mới
     const user = await User.create({
       username,
       phone,
-      password // Password sẽ được hash tự động bởi pre-save middleware
+      password, // Password sẽ được hash tự động bởi pre-save middleware
+      sessionToken
     });
 
-    // Tạo token
-    const token = generateToken(user._id);
+    // Tạo JWT token
+    const token = generateToken(user._id, sessionToken);
 
     res.status(201).json({
       success: true,
@@ -126,15 +132,26 @@ const login = async (req, res) => {
       });
     }
 
-    // Cập nhật lastLogin & Migration Gold
+    // Tạo session token mới (đá phiên cũ ra)
+    const sessionToken = uuidv4();
+
+    // Cập nhật lastLogin, sessionToken & Migration Gold
     user.lastLogin = Date.now();
+    user.sessionToken = sessionToken;
     if (user.gold === undefined) {
       user.gold = 1000;
     }
     await user.save();
 
-    // Tạo token
-    const token = generateToken(user._id);
+    // Đá phiên cũ ra qua Socket.IO (real-time)
+    if (req.io) {
+      req.io.to(`user:${user._id.toString()}`).emit('force_logout', {
+        message: 'Tài khoản đã đăng nhập ở nơi khác'
+      });
+    }
+
+    // Tạo JWT token
+    const token = generateToken(user._id, sessionToken);
 
     res.status(200).json({
       success: true,
@@ -321,13 +338,28 @@ const googleLogin = async (req, res) => {
       $or: [{ googleId }, { email }] 
     });
 
+    // Tạo session token mới (đá phiên cũ ra)
+    const sessionToken = uuidv4();
+
     if (user) {
       // User đã tồn tại - cập nhật googleId nếu chưa có
       if (!user.googleId) {
         user.googleId = googleId;
       }
       user.lastLogin = Date.now();
+      user.sessionToken = sessionToken;
+      // Lazy migration: Nếu chưa có gold thì set default
+      if (user.gold === undefined) {
+        user.gold = 1000;
+      }
       await user.save();
+
+      // Đá phiên cũ ra qua Socket.IO (real-time)
+      if (req.io) {
+        req.io.to(`user:${user._id.toString()}`).emit('force_logout', {
+          message: 'Tài khoản đã đăng nhập ở nơi khác'
+        });
+      }
     } else {
       // Tạo user mới từ Google account
       // Tạo username unique từ tên Google
@@ -346,12 +378,14 @@ const googleLogin = async (req, res) => {
         googleId,
         email,
         displayName: name,
-        isFirstLogin: true
+        isFirstLogin: true,
+        gold: 1000,
+        sessionToken
       });
     }
 
     // Tạo JWT token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, sessionToken);
 
     res.status(200).json({
       success: true,
@@ -368,6 +402,7 @@ const googleLogin = async (req, res) => {
         selectedTank: user.selectedTank,
         vipLevel: user.vipLevel,
         diamonds: user.diamonds,
+        gold: user.gold === undefined ? 1000 : user.gold,
         lastLogin: user.lastLogin
       }
     });

@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { getToken } from "../utils/auth.js";
+import { getToken, handleSessionExpired } from "../utils/auth.js";
 
 let socket;
 const SERVER_URL = 'http://localhost:3000';
@@ -31,10 +31,20 @@ export const initSocket = () => {
 
   socket.on('connect_error', (err) => {
     console.error('❌ Socket connection error:', err.message);
+    // Kiểm tra nếu bị đá do đăng nhập nơi khác
+    if (err.message && err.message.includes('SESSION_EXPIRED')) {
+      handleSessionExpired();
+    }
   });
 
   socket.on('disconnect', (reason) => {
     console.log('❌ Socket disconnected:', reason);
+  });
+
+  // Lắng nghe event bị đá ra khi đăng nhập ở nơi khác
+  socket.on('force_logout', (data) => {
+    console.log('🚫 Force logout:', data.message);
+    handleSessionExpired();
   });
 
   return socket;

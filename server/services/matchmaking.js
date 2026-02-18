@@ -3,10 +3,12 @@ const { v4: uuidv4 } = require('uuid');
 
 /**
  * Matchmaking Queue - Hàng đợi tìm trận
+ * Ghép 2 người chơi bất kì khi đủ >= 2 người trong queue
  */
 class MatchmakingQueue {
   constructor() {
     this.queue = []; // Danh sách players đang chờ
+    this.sessions = new Map(); // sessionId → session data (để track chọn tank + ready)
   }
 
   /**
@@ -32,7 +34,7 @@ class MatchmakingQueue {
   }
 
   /**
-   * Tạo trận đấu với 2 players
+   * Tạo trận đấu với 2 players (chưa chọn tank)
    */
   async createMatch() {
     // Lấy 2 players đầu tiên trong queue
@@ -42,7 +44,7 @@ class MatchmakingQueue {
     const sessionId = uuidv4();
 
     try {
-      // Tạo game session trong database
+      // Tạo game session trong database (chưa có tank)
       const gameSession = await GameSession.create({
         sessionId,
         players: [
@@ -50,19 +52,42 @@ class MatchmakingQueue {
             userId: player1.userId,
             username: player1.username,
             socketId: player1.socketId,
-            tank: player1.tank,
-            status: 'ready'
+            tank: null, // Chưa chọn tank
+            status: 'waiting'
           },
           {
             userId: player2.userId,
             username: player2.username,
             socketId: player2.socketId,
-            tank: player2.tank,
-            status: 'ready'
+            tank: null, // Chưa chọn tank
+            status: 'waiting'
           }
         ],
         status: 'waiting',
         startTime: new Date()
+      });
+
+      // Lưu session data để track chọn tank + ready
+      this.sessions.set(sessionId, {
+        sessionId,
+        players: {
+          [player1.userId]: {
+            userId: player1.userId,
+            username: player1.username,
+            displayName: player1.displayName,
+            socketId: player1.socketId,
+            tank: null,
+            ready: false
+          },
+          [player2.userId]: {
+            userId: player2.userId,
+            username: player2.username,
+            displayName: player2.displayName,
+            socketId: player2.socketId,
+            tank: null,
+            ready: false
+          }
+        }
       });
 
       console.log(`🎮 Match created: ${sessionId}`);
@@ -82,7 +107,49 @@ class MatchmakingQueue {
   }
 
   /**
-   * Xóa player khỏi queue (khi disconnect)
+   * Player chọn tank trong session
+   */
+  selectTank(sessionId, userId, tankId) {
+    const session = this.sessions.get(sessionId);
+    if (!session || !session.players[userId]) return null;
+
+    session.players[userId].tank = tankId;
+    return session;
+  }
+
+  /**
+   * Player confirm ready
+   * Trả về true nếu cả 2 đều ready
+   */
+  confirmReady(sessionId, userId) {
+    const session = this.sessions.get(sessionId);
+    if (!session || !session.players[userId]) return { allReady: false };
+
+    session.players[userId].ready = true;
+
+    // Kiểm tra cả 2 đã ready chưa
+    const players = Object.values(session.players);
+    const allReady = players.every(p => p.ready);
+
+    return { allReady, session };
+  }
+
+  /**
+   * Lấy session data
+   */
+  getSession(sessionId) {
+    return this.sessions.get(sessionId);
+  }
+
+  /**
+   * Xóa session (khi game bắt đầu hoặc bị hủy)
+   */
+  removeSession(sessionId) {
+    this.sessions.delete(sessionId);
+  }
+
+  /**
+   * Xóa player khỏi queue (khi disconnect hoặc hủy)
    */
   removePlayer(socketId) {
     const index = this.queue.findIndex(p => p.socketId === socketId);

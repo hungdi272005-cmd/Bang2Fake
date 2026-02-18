@@ -26,6 +26,15 @@ const protect = async (req, res, next) => {
         });
       }
 
+      // Kiểm tra session: chỉ cho phép phiên đăng nhập mới nhất
+      if (decoded.sessionToken && req.user.sessionToken !== decoded.sessionToken) {
+        return res.status(401).json({
+          success: false,
+          code: 'SESSION_EXPIRED',
+          message: 'Tài khoản đã đăng nhập ở nơi khác. Vui lòng đăng nhập lại.'
+        });
+      }
+
       next();
     } catch (error) {
       console.error('JWT verify error:', error);
@@ -63,6 +72,11 @@ const socketAuth = async (socket, next) => {
 
     if (!user) {
       return next(new Error('Authentication error: User not found'));
+    }
+
+    // Kiểm tra session: chỉ cho phép phiên đăng nhập mới nhất
+    if (decoded.sessionToken && user.sessionToken !== decoded.sessionToken) {
+      return next(new Error('SESSION_EXPIRED: Tài khoản đã đăng nhập ở nơi khác'));
     }
 
     // Attach user info vào socket
