@@ -1,0 +1,118 @@
+.friends-modal {
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.friends-tabs {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border-glass);
+    padding-bottom: var(--space-xs);
+}
+
+.friends-tab {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: var(--space-xs) var(--space-md);
+    cursor: pointer;
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    position: relative;
+    transition: color var(--transition-fast);
+}
+
+.friends-tab.active {
+    color: var(--primary-orange);
+}
+
+.friends-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-orange);
+}
+
+.friends-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 300px;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+    margin-bottom: var(--space-xs);
+}
+
+.friend-item.clickable:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.friend-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.friend-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-card);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.friend-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.friend-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.friend-status {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.friend-status.online {
+    color: #4ade80;
+}
+
+.search-box {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.btn-sm {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.75rem;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.hidden {
+    display: none !important;
+}

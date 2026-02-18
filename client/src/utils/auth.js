@@ -103,11 +103,49 @@ export function logout() {
 }
 
 /**
+ * Hiển thị Modal thông báo hết hạn phiên đăng nhập
+ */
+function showSessionExpiredModal() {
+  // Tạo element modal
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  
+  overlay.innerHTML = `
+    <div class="modal-container glass-card">
+      <div class="modal-header">
+        <span class="modal-icon">⚠️</span>
+        <h3 class="modal-title">Thông báo hệ thống</h3>
+      </div>
+      <div class="modal-body">
+        <p>Tài khoản của bạn đang được đăng nhập ở một nơi khách. Vui lòng kiểm tra lại.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="session-ok-btn" class="btn btn-primary">Xác nhận (OK)</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Trigger animation
+  setTimeout(() => overlay.classList.add('show'), 10);
+
+  // Handle click OK
+  const okBtn = overlay.querySelector('#session-ok-btn');
+  okBtn.onclick = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      overlay.remove();
+      logout();
+    }, 300);
+  };
+}
+
+/**
  * Xử lý khi bị đá ra do đăng nhập ở nơi khác
  */
 export function handleSessionExpired() {
-  alert('⚠️ Tài khoản của bạn đã đăng nhập ở nơi khác. Bạn sẽ được chuyển về trang đăng nhập.');
-  logout();
+  showSessionExpiredModal();
 }
 
 /**
