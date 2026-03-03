@@ -148,6 +148,22 @@ module.exports = (io, socket) => {
     });
   });
 
+  // Đồng bộ phá tường mềm giữa 2 người chơi
+  socket.on('wallDestroyed', (data) => {
+    socket.to(`session:${data.sessionId}`).emit('opponentWallDestroyed', {
+      row: data.row,
+      col: data.col
+    });
+  });
+
+  // Sự kiện nhặt item
+  socket.on('itemCollected', (data) => {
+    socket.to(`session:${data.sessionId}`).emit('opponentItemCollected', {
+      row: data.row,
+      col: data.col
+    });
+  });
+
   /**
    * Event: disconnect
    */

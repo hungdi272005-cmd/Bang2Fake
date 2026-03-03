@@ -8,6 +8,8 @@ export default class Projectile extends Phaser.GameObjects.Container {
     this.range = options.range || 300;
     this.angle = options.angle || 0; // Radian = Góc quay
     this.damage = options.damage || 10;
+    this.ownerTeam = options.ownerTeam || 0;         // Team của người bắn (để tránh friendly fire)
+    this.ownerContainer = options.ownerContainer || null; // Container của người bắn
     
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);

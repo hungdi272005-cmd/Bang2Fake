@@ -110,7 +110,7 @@ export default class DeepoolSkillSpace extends Skill {
           onComplete: () => visuals.destroy()
       });
 
-      // Áp dụng vận tốc
+      // Áp dụng vận tốc (visual cục bộ cho máy Deepool)
       if (target.body) {
           // Tạm thời reset lực cản để bay
           target.orgDrag = target.body.drag.x;
@@ -122,6 +122,18 @@ export default class DeepoolSkillSpace extends Skill {
           if (target.tankInstance) {
               target.tankInstance.isStunned = true; 
           }
+      }
+
+      // Gửi knockback qua mạng → đối thủ tự apply lên player của họ
+      // Để vị trí thật sự thay đổi trên cả 2 máy, tránh snap-back
+      if (target.tankInstance && target.tankInstance.onEffectCallback) {
+          target.tankInstance.onEffectCallback('knockback', {
+              angle,
+              speed: this.knockbackSpeed,
+              distance: this.knockbackDistance,
+              wallDamage: this.wallDamage,
+              stunDuration: this.stunDuration
+          });
       }
 
       // Theo dõi quá trình đẩy lùi

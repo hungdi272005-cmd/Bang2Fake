@@ -107,10 +107,14 @@ export default class GameScene extends Phaser.Scene {
     // 2. Tank vs Tank (Chặn nhau - khác team)
     this.physics.add.collider(this.player.container, this.dummy.container);
 
-    // 3. Tank vs Item (Overlap -> Ăn)
+    // 3. Tank vs Item (Overlap -> Ăn + đồng bộ qua mạng)
     this.physics.add.overlap(this.player.container, this.map.items, (player, item) => {
+        const gridPos = item.getData('gridPos');
         item.destroy();
         console.log("Collected Item!");
+        if (gridPos && this.networkManager) {
+            this.networkManager.sendItemCollected(gridPos.row, gridPos.col);
+        }
     });
 
     // 4. Đạn vs Tường cứng -> Đạn nổ
@@ -118,25 +122,52 @@ export default class GameScene extends Phaser.Scene {
         projectile.destroy();
     });
 
-    // 5. Đạn vs Tường mềm -> Cả 2 cùng mất
+    // 5. Đạn vs Tường mềm -> Phá tường + đồng bộ qua mạng
+    // Chỉ đạn của player mới phá tường, đạn đối thủ (từ network) chỉ bị hủy
+    // vì tường đã được đồng bộ qua event wallDestroyed rồi
     this.physics.add.collider(this.projectiles, this.map.softWalls, (projectile, wall) => {
         projectile.destroy();
+
+        // Đạn đối thủ (dummy) → chỉ hủy đạn, KHÔNG phá tường
+        // Tường sẽ được đồng bộ qua network event wallDestroyed
+        if (projectile.ownerContainer && projectile.ownerContainer === this.dummy.container) {
+            return;
+        }
+
+        // Đạn của player → phá tường + gửi sync
+        const gridPos = wall.getData('gridPos');
         this.map.destroySoftWall(wall);
+        if (gridPos && this.networkManager) {
+            this.networkManager.sendWallDestroyed(gridPos.row, gridPos.col);
+        }
     });
 
-    // 6. Đạn vs Enemy
+    // 6. Đạn vs Enemy (Kiểm tra team để tránh tự gây sát thương / friendly fire)
     this.physics.add.overlap(this.projectiles, this.enemies, (projectile, enemyContainer) => {
+        // Lấy thông tin team của mục tiêu
+        const targetTank = enemyContainer.tankInstance;
+        const targetTeam = targetTank ? targetTank.team : 0;
+
+        // Bỏ qua nếu đạn và mục tiêu cùng team (không gây sát thương đồng minh)
+        if (projectile.ownerTeam && projectile.ownerTeam === targetTeam) {
+            return;
+        }
+
+        // Bỏ qua nếu đạn trúng chính người bắn
+        if (projectile.ownerContainer && projectile.ownerContainer === enemyContainer) {
+            return;
+        }
+
         projectile.destroy();
         
-        if (this.dummy && this.dummy.container === enemyContainer) {
+        if (targetTank) {
             const damage = projectile.damage || 50; 
-            this.dummy.takeDamage(damage); 
-            // onEffectCallback trên dummy sẽ tự broadcast damage qua network
+            targetTank.takeDamage(damage); 
             
-            if (this.dummy.body && this.dummy.body.setTint) {
-                this.dummy.body.setTint(0xff0000);
+            if (targetTank.body && targetTank.body.setTint) {
+                targetTank.body.setTint(0xff0000);
                 this.time.delayedCall(100, () => {
-                   if(this.dummy && this.dummy.body) this.dummy.body.clearTint();
+                   if(targetTank && targetTank.body) targetTank.body.clearTint();
                 });
             }
         }
@@ -198,6 +229,26 @@ export default class GameScene extends Phaser.Scene {
           this.player.applySilence(params.duration, true);
           console.log(`🔇 Bị câm lặng ${params.duration}ms!`);
           break;
+        case 'knockback':
+          this.applyKnockbackToPlayer(params);
+          console.log(`💨 Bị đẩy lùi!`);
+          break;
+      }
+    });
+
+    // --- Nhận event phá tường mềm từ đối thủ → đồng bộ map ---
+    this.networkManager.onOpponentWallDestroyed((data) => {
+      if (this.map) {
+        this.map.destroySoftWallAt(data.row, data.col);
+        console.log(`🧱 Đối thủ phá tường tại [${data.row}, ${data.col}]`);
+      }
+    });
+
+    // --- Nhận event nhặt item từ đối thủ → đồng bộ map ---
+    this.networkManager.onOpponentItemCollected((data) => {
+      if (this.map) {
+        this.map.destroyItemAt(data.row, data.col);
+        console.log(`📦 Đối thủ nhặt item tại [${data.row}, ${data.col}]`);
       }
     });
 
@@ -216,6 +267,56 @@ export default class GameScene extends Phaser.Scene {
     // --- TRẠNG THÁI (Status) ---
     this.fpsDisplay = new FPSDisplay(this, 10, 10);
     this.networkStatus = new NetworkStatus(this, 10, 40);
+  }
+
+  /**
+   * Áp dụng knockback lên player (nhận từ network)
+   */
+  applyKnockbackToPlayer(params) {
+    const { angle, speed, distance, wallDamage, stunDuration } = params;
+    const container = this.player.container;
+    if (!container || !container.body) return;
+
+    const velocityX = Math.cos(angle) * speed;
+    const velocityY = Math.sin(angle) * speed;
+
+    container.orgDrag = container.body.drag.x;
+    container.body.setDrag(0);
+    container.body.setVelocity(velocityX, velocityY);
+    container.isKnockedBack = true;
+    this.player.isStunned = true;
+
+    const dur = (distance / speed) * 1000;
+    const startTime = this.time.now;
+
+    const knockbackTimer = this.time.addEvent({
+      delay: 16,
+      loop: true,
+      callback: () => {
+        if (!container.active || !container.body) { stopKB(); return; }
+        const elapsed = this.time.now - startTime;
+
+        if (container.body.blocked.left || container.body.blocked.right ||
+            container.body.blocked.up || container.body.blocked.down) {
+          this.player.takeDamage(wallDamage, true);
+          stopKB();
+          this.player.applyStun(stunDuration, true);
+          this.cameras.main.shake(100, 0.005);
+          return;
+        }
+        if (elapsed >= dur) { stopKB(); }
+      }
+    });
+
+    const stopKB = () => {
+      knockbackTimer.remove();
+      if (container.active && container.body) {
+        container.body.setVelocity(0, 0);
+        container.body.setDrag(container.orgDrag || 100);
+        container.isKnockedBack = false;
+        this.player.isStunned = false;
+      }
+    };
   }
 
   /**
@@ -266,7 +367,13 @@ export default class GameScene extends Phaser.Scene {
       this.networkManager.sendPlayerUpdate(this.player);
       
       // Nhận + lerp vị trí đối thủ
-      this.networkManager.updateOpponent(this.dummy);
+      // Bỏ qua khi dummy đang bị knockback/stun bởi skill local
+      // để tránh lerp kéo dummy về vị trí cũ giữa chừng
+      const dummyContainer = this.dummy ? this.dummy.container : null;
+      const isKnockedBack = dummyContainer && dummyContainer.isKnockedBack;
+      if (!isKnockedBack) {
+        this.networkManager.updateOpponent(this.dummy);
+      }
     }
 
     // Cập nhật weapon/abilities cho dummy (để visual đúng vị trí)

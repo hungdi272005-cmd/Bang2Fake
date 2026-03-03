@@ -118,12 +118,18 @@ export default class TankWeapon {
         // Ví dụ: bullet.setScale(1.5); (nhưng cần bullet instance trước)
     }
 
+    // Lấy thông tin team từ Tank chủ sở hữu
+    const ownerTank = this.parentContainer.tankInstance;
+    const ownerTeam = ownerTank ? ownerTank.team : 0;
+
     // Khởi tạo đạn
     const bullet = new BulletClass(this.scene, spawnX, spawnY, {
         speed: this.bulletSpeed,
         range: this.range,
         damage: damage, // Truyền damage vào option
-        angle: angle
+        angle: angle,
+        ownerTeam: ownerTeam,              // Team của người bắn
+        ownerContainer: this.parentContainer // Container của người bắn
     });
 
     if (damage > this.damage) {

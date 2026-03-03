@@ -36,6 +36,8 @@ export default class NetworkManager {
     this.onOpponentShootCallback = null;
     this.onOpponentSkillCallback = null;
     this.onOpponentEffectCallback = null;
+    this.onOpponentWallDestroyedCallback = null;
+    this.onOpponentItemCollectedCallback = null;
     
     // Setup listeners
     this.setupListeners();
@@ -77,6 +79,20 @@ export default class NetworkManager {
     this.socket.on('opponentEffect', (data) => {
       if (this.onOpponentEffectCallback) {
         this.onOpponentEffectCallback(data);
+      }
+    });
+
+    // Nhận event phá tường mềm từ đối thủ
+    this.socket.on('opponentWallDestroyed', (data) => {
+      if (this.onOpponentWallDestroyedCallback) {
+        this.onOpponentWallDestroyedCallback(data);
+      }
+    });
+
+    // Nhận event nhặt item từ đối thủ
+    this.socket.on('opponentItemCollected', (data) => {
+      if (this.onOpponentItemCollectedCallback) {
+        this.onOpponentItemCollectedCallback(data);
       }
     });
   }
@@ -137,6 +153,28 @@ export default class NetworkManager {
   /**
    * Gửi effect (damage/stun/slow/silence) — gọi bởi Tank.onEffectCallback
    */
+  /**
+   * Gửi event phá tường mềm — gọi khi đạn phá tường
+   */
+  sendWallDestroyed(row, col) {
+    if (!this.socket) return;
+    
+    this.socket.emit('wallDestroyed', {
+      sessionId: this.sessionId,
+      row,
+      col
+    });
+  }
+
+  sendItemCollected(row, col) {
+    if (!this.socket) return;
+    this.socket.emit('itemCollected', {
+      sessionId: this.sessionId,
+      row,
+      col
+    });
+  }
+
   sendEffect(type, params) {
     if (!this.socket) return;
     
@@ -202,6 +240,14 @@ export default class NetworkManager {
     this.onOpponentEffectCallback = callback;
   }
 
+  onOpponentWallDestroyed(callback) {
+    this.onOpponentWallDestroyedCallback = callback;
+  }
+
+  onOpponentItemCollected(callback) {
+    this.onOpponentItemCollectedCallback = callback;
+  }
+
   /**
    * Cleanup
    */
@@ -211,6 +257,8 @@ export default class NetworkManager {
       this.socket.off('opponentShoot');
       this.socket.off('opponentSkill');
       this.socket.off('opponentEffect');
+      this.socket.off('opponentWallDestroyed');
+      this.socket.off('opponentItemCollected');
     }
     console.log('🌐 NetworkManager destroyed');
   }

@@ -80,6 +80,7 @@ export default class BattleMap {
                 } else if (tile === 'B') {
                     // Item (Buff)
                     const item = this.scene.add.rectangle(x, y, this.TILE_SIZE * 0.6, this.TILE_SIZE * 0.6, 0x00FFFF); // Màu Cyan
+                    item.setData('gridPos', { row: rowIndex, col: colIndex });
                     // Thêm hiệu ứng xoay cho item
                     this.scene.tweens.add({
                         targets: item,
@@ -116,6 +117,39 @@ export default class BattleMap {
 
         wall.destroy(); // Phá hủy tường ngay lập tức (1 hit)
         // TODO: Thêm hiệu ứng vỡ gạch
+    }
+
+    // Phá tường mềm theo tọa độ grid (dùng cho đồng bộ mạng)
+    destroySoftWallAt(row, col) {
+        let found = false;
+        this.softWalls.children.each((wall) => {
+            if (!wall.active) return;
+            const pos = wall.getData('gridPos');
+            if (pos && pos.row === row && pos.col === col) {
+                this.destroySoftWall(wall);
+                found = true;
+            }
+        });
+        if (!found) {
+            // Cập nhật mapMatrix dù không tìm thấy wall (có thể đã bị phá trước đó)
+            if (this.mapMatrix[row] && this.mapMatrix[row][col]) {
+                this.mapMatrix[row][col] = '0';
+            }
+        }
+    }
+
+    // Phá item theo tọa độ grid (đồng bộ mạng)
+    destroyItemAt(row, col) {
+        this.items.children.each((item) => {
+            if (!item.active) return;
+            const pos = item.getData('gridPos');
+            if (pos && pos.row === row && pos.col === col) {
+                item.destroy();
+            }
+        });
+        if (this.mapMatrix[row] && this.mapMatrix[row][col]) {
+            this.mapMatrix[row][col] = '0';
+        }
     }
 
     getSpawnPoints() {
